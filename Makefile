@@ -20,5 +20,5 @@ opencv: opencv.cpp
 	$(CC) opencv.cpp -o opencv $(CV_CFLAGS) $(CV_LDFLAGS)
 
 clean:
-	-rm opencv
+	-rm opencv *.pyc
 .PHONY: clean
