@@ -5,6 +5,8 @@ import numpy as np
 import cv2
 import sys
 
+import Tkinter # for Tkinter.Tk().winfo_screenwidth()
+
 def minmax(array):
     '''numpy.ndarray find min and max'''
     return (array.min(), array.max())
@@ -73,8 +75,12 @@ if __name__ == '__main__':
     print("Minimum and maximum pixel values in the image: Min: %d Max: %d" % (min_v, max_v))
     img = (img-min_v)*(2**bit/(max_v - min_v -1 ))
 
+    # determine screen size (see http://stackoverflow.com/a/3949983/183995 )
+    root = Tkinter.Tk()
+    screen_width, screen_height = root.winfo_screenwidth(), root.winfo_screenheight()
     small = img
-    small = cv2.pyrDown(small)
+    while small.shape[0] > screen_height or small.shape[1] > screen_width:
+        small = cv2.pyrDown(small)
 
     def onmouse(event, x, y, flags, param):
         h, w = img.shape[:2]
@@ -82,8 +88,9 @@ if __name__ == '__main__':
         x, y = int(1.0*x*h/hs), int(1.0*y*h/hs)
         show_zoom(x,y)
 
-    zoom_size = 200
-    zoom = np.zeros((zoom_size*2, zoom_size*2),np.uint16)
+    zoom_size = 256
+    zoom_factor = 3
+    zoom = np.zeros((zoom_size*zoom_factor, zoom_size*zoom_factor),img.dtype)
     def show_zoom(x,y):
         h, w = img.shape[:2]
         img_box = rectangle()
@@ -95,7 +102,8 @@ if __name__ == '__main__':
         #cv2.GetSubRect(img, (60, 70, 32, 32))
         #zoom = cv2.getRectSubPix(img, (200, 200), (x, y))
         #zoom = img[f.y:t.y, f.x:t.x]
-        cv2.resize(img[f.y:t.y, f.x:t.x], dsize=(zoom_size*2,zoom_size*2), dst=zoom)
+        ## http://docs.opencv.org/modules/imgproc/doc/geometric_transformations.html#resize
+        cv2.resize(img[f.y:t.y, f.x:t.x], dsize=(zoom_size*zoom_factor,zoom_size*zoom_factor), dst=zoom, interpolation=cv2.INTER_NEAREST)
         cv2.imshow('Detail', zoom)
     cv2.namedWindow("Detail")
     cv2.moveWindow("Detail", 500, 400)
