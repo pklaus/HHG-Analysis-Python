@@ -36,8 +36,7 @@ class rectangle(object):
         box = rectangle()
         box.pos.x = center.x - size/2
         box.pos.y = center.y - size/2
-        box.dim.x = size
-        box.dim.y = size
+        box.dim.x, box.dim.y = size, size
         if  box.pos.x < self.pos.x:
             box.move(coordinates(self.pos.x - box.pos.x, 0))
         if  box.pos.y < self.pos.y:
@@ -57,40 +56,50 @@ if __name__ == '__main__':
         fn = sys.argv[1]
         print 'loading %s ...' % fn
         img = cv2.imread(fn,-1)
+        bit = 16
     else:
         print 'This sample shows how to implement a simple hi resolution image navigation.'
         print 'USAGE: browse.py [image filename]\n'
 
         sz = 4096
+        bit = 8
         print 'generating %dx%d procedural image ...' % (sz, sz)
-        img = np.zeros((sz, sz), np.uint16)
+        img = np.zeros((sz, sz), np.uint8)
         track = np.cumsum(np.random.rand(500000, 2)-0.5, axis=0)
         track = np.int32(track*10 + (sz/2, sz/2))
         cv2.polylines(img, [track], 0, 255, 1, cv2.CV_AA)
 
     min_v, max_v = minmax(img)
     print("Minimum and maximum pixel values in the image: Min: %d Max: %d" % (min_v, max_v))
-    img = (img-min_v)*(2**16/(max_v - min_v -1 ))
+    img = (img-min_v)*(2**bit/(max_v - min_v -1 ))
 
     small = img
-    for i in range(1):
-        small = cv2.pyrDown(small)
+    small = cv2.pyrDown(small)
 
     def onmouse(event, x, y, flags, param):
         h, w = img.shape[:2]
         hs, ws = small.shape[:2]
         x, y = int(1.0*x*h/hs), int(1.0*y*h/hs)
-        #zoom = cv2.getRectSubPix(img, (800, 600), (x+0.5, y+0.5))
-        #cv2.GetSubRect(img, (60, 70, 32, 32))
+        show_zoom(x,y)
+
+    zoom_size = 200
+    zoom = np.zeros((zoom_size*2, zoom_size*2),np.uint16)
+    def show_zoom(x,y):
+        h, w = img.shape[:2]
         img_box = rectangle()
         img_box.pos = coordinates(0,0)
         img_box.dim = coordinates(w,h)
-        box = img_box.get_rectangle_inside(200, coordinates(x,y))
+        box = img_box.get_rectangle_inside(zoom_size, coordinates(x,y))
         f, t = box.corners()
-        zoom = img[f.y:t.y, f.x:t.x]
+        #zoom = cv2.getRectSubPix(img, (800, 600), (x+0.5, y+0.5))
+        #cv2.GetSubRect(img, (60, 70, 32, 32))
         #zoom = cv2.getRectSubPix(img, (200, 200), (x, y))
-        cv2.imshow('zoom', zoom)
-
-    cv2.imshow('preview', small)
-    cv2.setMouseCallback('preview', onmouse)
+        #zoom = img[f.y:t.y, f.x:t.x]
+        cv2.resize(img[f.y:t.y, f.x:t.x], dsize=(zoom_size*2,zoom_size*2), dst=zoom)
+        cv2.imshow('Detail', zoom)
+    cv2.namedWindow("Detail")
+    cv2.moveWindow("Detail", 500, 400)
+    cv2.imshow('Overview', small)
+    show_zoom(0,0)
+    cv2.setMouseCallback('Overview', onmouse)
     cv2.waitKey()
