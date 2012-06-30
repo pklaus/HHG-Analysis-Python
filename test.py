@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from acquisition import read_run_file, dump_structure, get_stage_positions, get_photodiode_scope_channel, get_ion_scope_channel, get_scope_channel, calculate_ion_signal
+from dataformat import read_run_file, dump_structure, get_stage_positions, get_photodiode_scope_channel, get_ion_scope_channel, get_scope_channel, calculate_ion_signal
 from plot import plot_multiple, plot
 from signalprocessing import calculate_sum, remove_high_frequency_noise, smooth
 from numpy import sum
