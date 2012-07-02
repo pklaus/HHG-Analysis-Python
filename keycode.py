@@ -1,0 +1,10 @@
+#!/usr/bin/env python
+
+KEY_ESCAPE = 27
+
+KEY_SPACE = 32
+
+KEY_UP = 63232
+KEY_DOWN = 63233
+KEY_LEFT = 63234
+KEY_RIGHT = 63235

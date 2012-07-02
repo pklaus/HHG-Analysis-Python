@@ -9,6 +9,9 @@ from multiprocessing import Pool
 from tiff import TIFF16bit
 import cv2
 
+PD_SCOPE_CHANNEL = 0
+ION_SCOPE_CHANNEL = 1
+
 class Measurement(object):
     avg_folder_match = r'avg_(\d)'
     timestamp_match = r'(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})f(\d{2})'
@@ -47,11 +50,12 @@ class Measurement(object):
             raise NameError("This folder doesn't seem to contain measurement data")
 
         ## Parallel processing of the files
-        #p = Pool(processes=4)
-        #self.measurementPoints = p.map(process_MeasurementPoint, xmlfiles)
-        self.measurementPoints = []
-        for xmlfile in xmlfiles:
-            self.measurementPoints.append(process_MeasurementPoint(xmlfile))
+        p = Pool(processes=4)
+        self.measurementPoints = p.map(process_MeasurementPoint, xmlfiles)
+        ## Sequential processing of the files
+        #self.measurementPoints = []
+        #for xmlfile in xmlfiles:
+        #    self.measurementPoints.append(process_MeasurementPoint(xmlfile))
 
 def process_MeasurementPoint(instructions):
     #print instructions
@@ -86,49 +90,51 @@ class MeasurementPoint(object):
             self.img.img -= TIFF16bit(os.path.join(bgfile)).img
     def rescale_image(self):
         self.img.rescale()
-    def display_image(self):
-        cv2.imshow('test',self.img.img)
-        print("Press key in OpenCV window to continue / exit.")
-        cv2.waitKey()
+    def display_image(self, rescaled=False):
+        if rescaled:
+            i = self.img
+            i.rescale()
+        i = self.img
+        cv2.imshow('test',i.img)
+        return cv2.waitKey()
     def __str__(self):
         return "MeasurementPoint: (date: %s, xml: %s, image: %s, bgimage: %s)" % (self.date, self.xmlfile, self.imgfile, self.bgfile)
 
-def dump_structure(run, level=0):
-    output = ''
-    for element in run:
-        output += ''.join(['--' for i in range(level)])
-        output += "> " + element.tag
-        if element.text != None:
-            content = element.text.replace("\n"," ")
-            output += " :  "
-            if len(content) < 20:
-                output += content
-            else:
-                output += content[:20] + " ..."
-        output += "\n"
-        output += dump_structure(element, level+1)
-    return output
+    def dump_xml_structure(self, level=0):
+        output = ''
+        for element in self.xml:
+            output += ''.join(['--' for i in range(level)])
+            output += "> " + element.tag
+            if element.text != None:
+                content = element.text.replace("\n"," ")
+                output += " :  "
+                if len(content) < 20:
+                    output += content
+                else:
+                    output += content[:20] + " ..."
+            output += "\n"
+            output += self.dump_xml_structure(element, level+1)
+        return output
 
-def get_stage_positions(run):
-    pass
+    def get_stage_positions(self):
+        raise NotImplementedError
 
-def get_photodiode_scope_channel(run):
-    return get_scope_channel(run, 0)
+    def get_photodiode_scope_channel(self):
+        return self.get_scope_channel(PD_SCOPE_CHANNEL)
 
-def get_ion_scope_channel(run):
-    return get_scope_channel(run, 1)
+    def get_ion_scope_channel(run):
+        return self.get_scope_channel(ION_SCOPE_CHANNEL)
 
-def get_scope_channel(run, channel_no):
-    for scope in run:
-        if scope.tag == 'NI_TCP_Scope':
-            for channel in scope:
-                if channel.tag == 'CH' + str(channel_no):
-                    data = channel.text
-                    data = [float(value) for value in data.split()]
-                    return data
-
-def calculate_ion_signal(run):
-    ion_signal_point = 0.0
-    for ion_signal_point in get_ion_scope_channel(run):
-        ion_signal += ion_signal_point
-    return ion_signal
+    def get_scope_channel(run, channel_no):
+        for scope in run:
+            if scope.tag == 'NI_TCP_Scope':
+                for channel in scope:
+                    if channel.tag == 'CH' + str(channel_no):
+                        data = channel.text
+                        data = [float(value) for value in data.split()]
+                        return data
+    def calculate_ion_signal(self):
+        ion_signal_point = 0.0
+        for ion_signal_point in self.get_ion_scope_channel():
+            ion_signal += ion_signal_point
+        return ion_signal
