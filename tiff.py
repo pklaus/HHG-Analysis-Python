@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-''' browse.py - Sample shows how to implement a simple hi resolution image navigation '''
 
 import cv2
 import numpy as np
