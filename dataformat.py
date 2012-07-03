@@ -63,27 +63,26 @@ class Measurement(object):
         the creation process of the process_MeasurementPoint() call.
         """
         print "Starting after-processing."
-        print "Calculate overall minmax and percentiles_1_99."
         self.minmax = ( min([mp.minmax[0] for mp in self.measurementPoints]),
                         max([mp.minmax[1] for mp in self.measurementPoints]) )
         for mp in self.measurementPoints:
             mp.collection = self
 
 def process_MeasurementPoint(instructions):
-    #print instructions
     image_file, bg_file = Measurement.other_files_for_xml(instructions['f'])
     return MeasurementPoint(
         instructions['date'],
         instructions['avg'],
         os.path.join(instructions['d'], instructions['f']),
         os.path.join(instructions['d'], image_file),
-        os.path.join(instructions['d'], bg_file)
+        os.path.join(instructions['d'], bg_file),
         )
 
 class MeasurementPoint(object):
-    def __init__(self, date, avgnum, xmlfile, imgfile, bgfile = None):
     PD_SCOPE_CHANNEL = 0
     ION_SCOPE_CHANNEL = 1
+    collection = None
+    def __init__(self, date, avgnum, xmlfile, imgfile, bgfile=None):
         print("Reading XML file %s" % xmlfile)
         self.date = date
         self.avgnum = avgnum

@@ -21,6 +21,7 @@ if __name__ == '__main__':
     except Exception, e:
         print e
         sys.exit(2)
+    print "Measurement read in."
     i = 0
     print("Use the left / right keys to navigate.")
     while i in range(len(m.measurementPoints)):
