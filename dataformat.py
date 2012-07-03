@@ -9,8 +9,6 @@ from multiprocessing import Pool
 from tiff import TIFF16bit
 import cv2
 
-PD_SCOPE_CHANNEL = 0
-ION_SCOPE_CHANNEL = 1
 
 class Measurement(object):
     avg_folder_match = r'avg_(\d)'
@@ -70,6 +68,8 @@ def process_MeasurementPoint(instructions):
 
 class MeasurementPoint(object):
     def __init__(self, date, avgnum, xmlfile, imgfile, bgfile = None):
+    PD_SCOPE_CHANNEL = 0
+    ION_SCOPE_CHANNEL = 1
         print("Reading XML file %s" % xmlfile)
         self.date = date
         self.avgnum = avgnum
@@ -120,10 +120,10 @@ class MeasurementPoint(object):
         raise NotImplementedError
 
     def get_photodiode_scope_channel(self):
-        return self.get_scope_channel(PD_SCOPE_CHANNEL)
+        return self.get_scope_channel(self.PD_SCOPE_CHANNEL)
 
     def get_ion_scope_channel(run):
-        return self.get_scope_channel(ION_SCOPE_CHANNEL)
+        return self.get_scope_channel(self.ION_SCOPE_CHANNEL)
 
     def get_scope_channel(run, channel_no):
         for scope in run:
