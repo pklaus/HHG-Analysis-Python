@@ -23,7 +23,7 @@ class TIFF16bit():
         return self.img.min(), self.img.max()
     def rescale(self):
         min_v, max_v = self.minmax()
-        self.img = (self.img-min_v)*(2**16/(max_v - min_v -1 ))
+        return (self.img-min_v)*int((2**16-1.)/(max_v - min_v))
     def scale_down_to_half(self):
         self.img = cv2.pyrDown(self.img)
         self.update()
@@ -36,7 +36,7 @@ if __name__ == '__main__':
     i = TIFF16bit(sys.argv[1])
     print("Image of %dx%d pixels." % (i.dimensions))
     print("Depth: %d bit" % i.depth)
-    i.rescale()
-    cv2.imshow('test',i.img)
+    img = i.rescale()
+    cv2.imshow('test',img)
     print("Press key in OpenCV window to continue / exit.")
     cv2.waitKey()
