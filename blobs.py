@@ -19,6 +19,8 @@ def find_blobs(img):
     contours, hierarchy = cv2.findContours(temp, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE, )
     ## select only second level contours:
     toplevel_indices, secondlevel_contours = [],[]
+    if hierarchy == None:
+        return []
     h = hierarchy[0]
     for i in range(len(h)):
         if h[i][3] == -1:
