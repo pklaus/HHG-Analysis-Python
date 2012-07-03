@@ -55,6 +55,20 @@ class Measurement(object):
         #for xmlfile in xmlfiles:
         #    self.measurementPoints.append(process_MeasurementPoint(xmlfile))
 
+        self.after_process()
+
+    def after_process(self):
+        """Calculate overall properties
+        If they are expensive to calculate, their calculation should be prepared in
+        the creation process of the process_MeasurementPoint() call.
+        """
+        print "Starting after-processing."
+        print "Calculate overall minmax and percentiles_1_99."
+        self.minmax = ( min([mp.minmax[0] for mp in self.measurementPoints]),
+                        max([mp.minmax[1] for mp in self.measurementPoints]) )
+        for mp in self.measurementPoints:
+            mp.collection = self
+
 def process_MeasurementPoint(instructions):
     #print instructions
     image_file, bg_file = Measurement.other_files_for_xml(instructions['f'])
@@ -88,14 +102,22 @@ class MeasurementPoint(object):
         self.img = TIFF16bit(os.path.join(imgfile))
         if bgfile:
             self.img.img -= TIFF16bit(os.path.join(bgfile)).img
-    def rescale_image(self):
-        self.img.rescale()
-    def display_image(self, rescaled=False):
-        if rescaled:
+        self.minmax = self.img.minmax()
+        self.percentiles = self.img.percentiles([1,5,99,99.995])
+    def display_image(self, rescale=False, rescale_to_global_minmax=False, rescale_to_percentile_and_max=False):
+        if rescale:
             i = self.img
-            i.rescale()
-        i = self.img
-        cv2.imshow('test',i.img)
+            if rescale_to_global_minmax:
+                print("Rescaling to global min and max values (%d,%d)" % self.collection.minmax)
+                img = i.rescale(self.collection.minmax)
+            elif rescale_to_percentile_and_max:
+                print("Rescaling image using 5 percent percentile to local maximum value: (%d,%d)." % (self.percentiles[5], i.minmax()[1]))
+                img = i.rescale((self.percentiles[5], i.minmax()[1]))
+            else:
+                img = i.rescale(i.minmax())
+        else:
+            img = self.img.img
+        cv2.imshow('test',img)
         return cv2.waitKey()
     def __str__(self):
         return "MeasurementPoint: (date: %s, xml: %s, image: %s, bgimage: %s)" % (self.date, self.xmlfile, self.imgfile, self.bgfile)

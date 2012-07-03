@@ -25,7 +25,7 @@ if __name__ == '__main__':
     print("Use the left / right keys to navigate.")
     while i in range(len(m.measurementPoints)):
         print("Showing image %d of %d." % (i+1, len(m.measurementPoints)) )
-        key = m.measurementPoints[i].display_image(rescaled=True)
+        key = m.measurementPoints[i].display_image(rescale=True,rescale_to_percentile_and_max=True)
         if key == keycode.KEY_ESCAPE: # 27
             break
         if key in jump_by.keys():

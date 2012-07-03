@@ -31,7 +31,7 @@ if __name__ == '__main__':
     print("Minimum and maximum pixel values in the image: Min: %d Max: %d" % img.minmax())
     print("Rescaling to full 16bit")
 
-    img.rescale()
+    img.img = img.rescale()
 
     # determine screen size (see http://stackoverflow.com/a/3949983/183995 )
     root = Tkinter.Tk()
