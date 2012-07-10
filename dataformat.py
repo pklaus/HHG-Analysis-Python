@@ -6,9 +6,11 @@ import cv2
 import re
 import os
 from datetime import datetime
-from multiprocessing import Pool
+from multiprocessing import Pool, Manager
 from blobs import find_blobs
 from tiff import TIFF
+from progress import ProgressMeter
+import time
 
 
 class Measurement(object):
@@ -47,14 +49,33 @@ class Measurement(object):
                         xmlfiles.append({'date': date, 'd': dirname, 'f': filename, 'avg': re.match(self.avg_folder_match, avg_folder).groups()[0]})
         if xmlfiles == []:
             raise NameError("This folder doesn't seem to contain measurement data")
+        total = len(xmlfiles)
+        pm = ProgressMeter(total=total)
 
         ## Parallel processing of the files
-        p = Pool(processes=4)
-        self.measurementPoints = p.map(process_MeasurementPoint, xmlfiles)
+        finished = False
+        num_processes = 4
+        i = 0
+        p = Pool(processes=num_processes)
+        manager = Manager()
+        queue = manager.Queue()
+        result = p.map_async(process_MeasurementPoint_Wrapper, [(xmlfile, queue) for xmlfile in xmlfiles])
+        while not finished:
+            if not queue.empty():
+                #print("Processed XML file %s." % queue.get())
+                queue.get()
+                i += 1
+                if i == total: finished = True
+                if i % num_processes == 0: pm.update(4)
+            else:
+                time.sleep(0.02)
+        pm.update(4)
+        self.measurementPoints = result.get()
         ## Sequential processing of the files
         #self.measurementPoints = []
         #for xmlfile in xmlfiles:
         #    self.measurementPoints.append(process_MeasurementPoint(xmlfile))
+        #    pm.update(1)
 
         self.after_process()
 
@@ -69,6 +90,13 @@ class Measurement(object):
         self.blobs_found = max([len(mp.blobs) for mp in self.measurementPoints]) > 0
         for mp in self.measurementPoints:
             mp.collection = self
+
+def process_MeasurementPoint_Wrapper(args):
+    instructions = args[0]
+    queue = args[1]
+    retval = process_MeasurementPoint(instructions)
+    queue.put(instructions['f'])
+    return retval
 
 def process_MeasurementPoint(instructions):
     image_file, bg_file = Measurement.other_files_for_xml(instructions['f'])
@@ -85,7 +113,7 @@ class MeasurementPoint(object):
     ION_SCOPE_CHANNEL = 1
     collection = None
     def __init__(self, date, avgnum, xmlfile, imgfile, bgfile=None):
-        print("Reading XML file %s" % xmlfile)
+        #print("Reading XML file %s" % xmlfile)
         self.date = date
         self.avgnum = avgnum
         self.read_xml(xmlfile)
