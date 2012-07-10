@@ -29,7 +29,7 @@ if __name__ == '__main__':
         cv2.polylines(img_data, [track], 0, 255, 1, cv2.CV_AA)
 
     print("Minimum and maximum pixel values in the image: Min: %d Max: %d" % img.minmax())
-    print("Rescaling to full 16bit")
+    print("Rescaling to fill full 16bit space.")
 
     img.data = img.rescale()
 
