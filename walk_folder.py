@@ -21,6 +21,8 @@ if __name__ == '__main__':
     except Exception, e:
         print e
         sys.exit(2)
+    if m.blobs_found:
+        print("Attention, at least one image appears to have an overflow! Please correct that first.")
     print "Measurement read in."
     i = 0
     print("Use the left / right keys to navigate.")

@@ -2,11 +2,12 @@
 
 from xml.etree.ElementTree import parse
 from numpy import array
+import cv2
 import re
 import os
 from datetime import datetime
 from multiprocessing import Pool
-import cv2
+from blobs import find_blobs
 from tiff import TIFF
 
 
@@ -65,6 +66,7 @@ class Measurement(object):
         print "Starting after-processing."
         self.minmax = ( min([mp.minmax[0] for mp in self.measurementPoints]),
                         max([mp.minmax[1] for mp in self.measurementPoints]) )
+        self.blobs_found = max([len(mp.blobs) for mp in self.measurementPoints]) > 0
         for mp in self.measurementPoints:
             mp.collection = self
 
@@ -103,6 +105,7 @@ class MeasurementPoint(object):
             self.img.data -= TIFF(os.path.join(bgfile)).data
         self.minmax = self.img.minmax()
         self.percentiles = self.img.percentiles([1,5,99,99.995])
+        self.blobs = find_blobs(self.img.data)
     def display_image(self, rescale=False, rescale_to_global_minmax=False, rescale_to_percentile_and_max=False):
         if rescale:
             i = self.img
