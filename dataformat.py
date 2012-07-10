@@ -108,15 +108,15 @@ class MeasurementPoint(object):
             i = self.img
             if rescale_to_global_minmax:
                 print("Rescaling to global min and max values (%d,%d)" % self.collection.minmax)
-                img = i.rescale(self.collection.minmax)
+                img_data = i.rescale(self.collection.minmax)
             elif rescale_to_percentile_and_max:
                 print("Rescaling image using 5 percent percentile to local maximum value: (%d,%d)." % (self.percentiles[5], i.minmax()[1]))
-                img = i.rescale((self.percentiles[5], i.minmax()[1]))
+                img_data = i.rescale((self.percentiles[5], i.minmax()[1]))
             else:
-                img = i.rescale(i.minmax())
+                img_data = i.rescale(i.minmax())
         else:
-            img = self.img.data
-        cv2.imshow('test',img)
+            img_data = self.img.data
+        cv2.imshow('test',img_data)
         return cv2.waitKey()
     def __str__(self):
         return "MeasurementPoint: (date: %s, xml: %s, image: %s, bgimage: %s)" % (self.date, self.xmlfile, self.imgfile, self.bgfile)
