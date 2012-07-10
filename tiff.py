@@ -38,7 +38,6 @@ class TIFF16bit():
         min_v, max_v = int(min_v), int(max_v)
         subtract = np.choose(np.greater(self.data, min_v), (self.data, min_v))
         return (self.data-subtract)*int((2**16-1.)/(max_v - min_v))
-        return (self.data-min_v)*int((2**16-1.)/(max_v - min_v))
     def scale_down_to_half(self):
         self.data = cv2.pyrDown(self.data)
         self.update()
