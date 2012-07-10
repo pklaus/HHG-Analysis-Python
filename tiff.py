@@ -10,6 +10,8 @@ class TIFF():
     especially 16 bit grayscale images.
 
     It also contains frequently used operations on those images.
+
+    The image array data can be accessed via the property TIFF.data
     """
     depth_map = {'uint8': 8, 'uint16': 16, 'uint32': 32, 'uint64': 64}
     def __init__(self, filename=None):
@@ -18,11 +20,13 @@ class TIFF():
     def read(self,filename):
         self.data = cv2.imread(filename,-1)
         self.filename = filename
+    def get_data(self):
+        return self.__data
+    def set_data(self, data):
+        self.__data = data
+        #self.filename = None
         self.update()
-    def set(self,img):
-        self.data = img
-        self.filename = None
-        self.update()
+    data = property(get_data, set_data)
     def update(self):
         self.dimensions = self.data.shape[:2]
         self.depth = self.depth_map[str(self.data.dtype)]
