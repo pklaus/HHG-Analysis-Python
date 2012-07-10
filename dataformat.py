@@ -6,8 +6,8 @@ import re
 import os
 from datetime import datetime
 from multiprocessing import Pool
-from tiff import TIFF16bit
 import cv2
+from tiff import TIFF
 
 
 class Measurement(object):
@@ -98,9 +98,9 @@ class MeasurementPoint(object):
     def read_image(self, imgfile, bgfile=None):
         """ imgfile and bgfile should be ('/path/to/folder','filename.xml') """
         self.imgfile, self.bgfile = imgfile, bgfile
-        self.img = TIFF16bit(os.path.join(imgfile))
+        self.img = TIFF(os.path.join(imgfile))
         if bgfile:
-            self.img.data -= TIFF16bit(os.path.join(bgfile)).data
+            self.img.data -= TIFF(os.path.join(bgfile)).data
         self.minmax = self.img.minmax()
         self.percentiles = self.img.percentiles([1,5,99,99.995])
     def display_image(self, rescale=False, rescale_to_global_minmax=False, rescale_to_percentile_and_max=False):

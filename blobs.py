@@ -7,7 +7,7 @@ import numpy as np
 import cv2
 import cv2.cv as cv
 
-from tiff import TIFF16bit
+from tiff import TIFF
 
 def find_blobs(img):
     blobs = []

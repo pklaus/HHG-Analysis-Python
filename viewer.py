@@ -6,7 +6,7 @@ import cv2
 import sys
 
 from geometry import coordinates, rectangle
-from tiff import TIFF16bit
+from tiff import TIFF
 
 import Tkinter # for Tkinter.Tk().winfo_screenwidth()
 
@@ -14,7 +14,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         fn = sys.argv[1]
         print 'loading %s ...' % fn
-        img = TIFF16bit(fn)
+        img = TIFF(fn)
         bit = img.depth
     else:
         print 'This sample shows how to implement a simple hi resolution image navigation.'

@@ -4,7 +4,13 @@ import cv2
 import numpy as np
 from mathtools import scoreatpercentile
 
-class TIFF16bit():
+class TIFF():
+    """
+    A Class that helps reading TIFF image files,
+    especially 16 bit grayscale images.
+
+    It also contains frequently used operations on those images.
+    """
     depth_map = {'uint8': 8, 'uint16': 16, 'uint32': 32, 'uint64': 64}
     def __init__(self, filename=None):
         if filename:
@@ -47,7 +53,7 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print "Give a 16bit TIFF!"
         sys.exit(1)
-    i = TIFF16bit(sys.argv[1])
+    i = TIFF(sys.argv[1])
     print("Image of %dx%d pixels." % (i.dimensions))
     print("Depth: %d bit" % i.depth)
     img = i.rescale()
