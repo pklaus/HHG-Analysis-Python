@@ -31,7 +31,7 @@ if __name__ == '__main__':
     print("Minimum and maximum pixel values in the image: Min: %d Max: %d" % img.minmax())
     print("Rescaling to full 16bit")
 
-    img.img = img.rescale()
+    img.data = img.rescale()
 
     # determine screen size (see http://stackoverflow.com/a/3949983/183995 )
     root = Tkinter.Tk()
@@ -48,7 +48,7 @@ if __name__ == '__main__':
 
     zoom_window_size = 466
     zoom_factor = 3
-    zoom = np.zeros((zoom_window_size, zoom_window_size),img.img.dtype)
+    zoom = np.zeros((zoom_window_size, zoom_window_size),img.data.dtype)
     def show_zoom(x,y):
         h, w = img.dimensions
         img_box = rectangle()
@@ -61,11 +61,11 @@ if __name__ == '__main__':
         #zoom = cv2.getRectSubPix(img, (200, 200), (x, y))
         #zoom = img[f.y:t.y, f.x:t.x]
         ## http://docs.opencv.org/modules/imgproc/doc/geometric_transformations.html#resize
-        cv2.resize(img.img[f.y:t.y, f.x:t.x], dsize=(zoom_window_size,zoom_window_size), dst=zoom, interpolation=cv2.INTER_NEAREST)
+        cv2.resize(img.data[f.y:t.y, f.x:t.x], dsize=(zoom_window_size,zoom_window_size), dst=zoom, interpolation=cv2.INTER_NEAREST)
         cv2.imshow('Detail', zoom)
     cv2.namedWindow("Detail")
     cv2.moveWindow("Detail", 5, 50+small.dimensions[0])
-    cv2.imshow('Overview', small.img)
+    cv2.imshow('Overview', small.data)
     cv2.moveWindow("Overview", 5, 20)
     show_zoom(0,0)
     cv2.setMouseCallback('Overview', onmouse)

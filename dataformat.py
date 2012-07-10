@@ -100,7 +100,7 @@ class MeasurementPoint(object):
         self.imgfile, self.bgfile = imgfile, bgfile
         self.img = TIFF16bit(os.path.join(imgfile))
         if bgfile:
-            self.img.img -= TIFF16bit(os.path.join(bgfile)).img
+            self.img.data -= TIFF16bit(os.path.join(bgfile)).data
         self.minmax = self.img.minmax()
         self.percentiles = self.img.percentiles([1,5,99,99.995])
     def display_image(self, rescale=False, rescale_to_global_minmax=False, rescale_to_percentile_and_max=False):
@@ -115,7 +115,7 @@ class MeasurementPoint(object):
             else:
                 img = i.rescale(i.minmax())
         else:
-            img = self.img.img
+            img = self.img.data
         cv2.imshow('test',img)
         return cv2.waitKey()
     def __str__(self):

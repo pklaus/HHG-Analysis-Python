@@ -37,15 +37,15 @@ if __name__ == '__main__':
     from glob import glob
     for fn in glob('HHG*.png'):
         img = TIFF16bit(fn)
-        cv2.imshow('orig', img.img)
+        cv2.imshow('orig', img.data)
         h,w = img.dimensions
-        blobs = find_blobs(img.img)
+        blobs = find_blobs(img.data)
 
         vis = np.zeros((h, w, 3), np.uint8)
         cv2.drawContours( vis, blobs, -1, (128,255,255), 1, cv2.CV_AA)
         cv2.imshow('contours', vis)
 
-        img = cv2.cvtColor( img.img, cv.CV_GRAY2BGR )
+        img = cv2.cvtColor( img.data, cv.CV_GRAY2BGR )
         cv2.drawContours( img, blobs, -1, (128,255,255), 1, cv2.CV_AA)
 
         cv2.imshow('blobs', img)

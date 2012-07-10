@@ -10,25 +10,25 @@ class TIFF16bit():
         if filename:
             self.read(filename)
     def read(self,filename):
-        self.img = cv2.imread(filename,-1)
+        self.data = cv2.imread(filename,-1)
         self.filename = filename
         self.update()
     def set(self,img):
-        self.img = img
+        self.data = img
         self.filename = None
         self.update()
     def update(self):
-        self.dimensions = self.img.shape[:2]
-        self.depth = self.depth_map[str(self.img.dtype)]
+        self.dimensions = self.data.shape[:2]
+        self.depth = self.depth_map[str(self.data.dtype)]
     def percentiles(self, percentages):
         percentiles = dict()
-        values = self.img.flatten()
+        values = self.data.flatten()
         values.sort()
         for percentage in percentages:
             percentiles[percentage] = scoreatpercentile(values, percentage)
         return percentiles
     def minmax(self):
-        return self.img.min(), self.img.max()
+        return self.data.min(), self.data.max()
     def rescale(self, minmax=None):
         np.seterr(under='print')
         if minmax:
@@ -36,11 +36,11 @@ class TIFF16bit():
         else:
             min_v, max_v = self.minmax()
         min_v, max_v = int(min_v), int(max_v)
-        subtract = np.choose(np.greater(self.img, min_v), (self.img, min_v))
-        return (self.img-subtract)*int((2**16-1.)/(max_v - min_v))
-        return (self.img-min_v)*int((2**16-1.)/(max_v - min_v))
+        subtract = np.choose(np.greater(self.data, min_v), (self.data, min_v))
+        return (self.data-subtract)*int((2**16-1.)/(max_v - min_v))
+        return (self.data-min_v)*int((2**16-1.)/(max_v - min_v))
     def scale_down_to_half(self):
-        self.img = cv2.pyrDown(self.img)
+        self.data = cv2.pyrDown(self.data)
         self.update()
 
 if __name__ == '__main__':
