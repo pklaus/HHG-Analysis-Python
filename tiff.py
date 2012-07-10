@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 from mathtools import scoreatpercentile
 
-class TIFF():
+class TIFF(object):
     """
     A Class that helps reading TIFF image files,
     especially 16 bit grayscale images.
