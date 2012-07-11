@@ -87,7 +87,7 @@ class Measurement(object):
         p = Pool(processes=num_processes)
         manager = Manager()
         queue = manager.Queue()
-        result = p.map_async(process_MeasurementPoint_Wrapper, [(xmlfile, queue) for xmlfile in xmlfiles])
+        result = p.map_async(process_MeasurementPoint_QueueWrapper, [(xmlfile, queue) for xmlfile in xmlfiles])
         while not finished:
             if not queue.empty():
                 #print("Processed XML file %s." % queue.get())
