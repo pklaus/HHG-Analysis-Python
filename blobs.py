@@ -94,8 +94,8 @@ def main():
 
         blobs = find_blobs(img.data, verbose=True, min_area=3)
 
-        ## Draw a coloured line where contours have been found:
-        #img.dimensions
+        # Draw a coloured line where contours have been found:
+        #h,w = img.dimensions
         #vis = np.zeros((h, w, 3), np.uint8)
         #cv2.drawContours( vis, blobs, -1, (128,255,255), 1, cv2.CV_AA)
         #cv2.imshow('contours', vis)
