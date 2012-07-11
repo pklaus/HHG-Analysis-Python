@@ -175,7 +175,7 @@ class MeasurementPoint(object):
         self.img = TIFF(os.path.join(imgfile))
         if bgfile:
             self.img.data -= TIFF(os.path.join(bgfile)).data
-        self.minmax = self.img.minmax()
+        self.minmax = self.img.minmax
         self.percentiles = self.img.percentiles([1,5,99,99.995])
         self.blobs = find_blobs(self.img.data)
     def display_image(self, rescale=False, rescale_to_global_minmax=False, rescale_to_percentile_and_max=False):
@@ -186,10 +186,10 @@ class MeasurementPoint(object):
                 print("Rescaling to global min and max values (%d,%d)" % self.collection.minmax)
                 img_data = i.rescale(self.collection.minmax)
             elif rescale_to_percentile_and_max:
-                print("Rescaling image using 5 percent percentile to local maximum value: (%d,%d)." % (self.percentiles[5], i.minmax()[1]))
-                img_data = i.rescale((self.percentiles[5], i.minmax()[1]))
+                print("Rescaling image using 5 percent percentile to local maximum value: (%d,%d)." % (self.percentiles[5], i.minmax[1]))
+                img_data = i.rescale((self.percentiles[5], i.minmax[1]))
             else:
-                img_data = i.rescale(i.minmax())
+                img_data = i.rescale(i.minmax)
         else:
             img_data = self.img.data
         cv2.imshow('test',img_data)

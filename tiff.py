@@ -49,7 +49,9 @@ class TIFF(object):
         for percentage in percentages:
             percentiles[percentage] = scoreatpercentile(values, percentage)
         return percentiles
+    @property
     def minmax(self):
+        """A tuple containing the minimum and maximum pixel values in the image."""
         return self.data.min(), self.data.max()
     def rescale(self, minmax=None):
         """Get image data with changed intensity scaling.
@@ -62,7 +64,7 @@ class TIFF(object):
         if minmax:
             min_v, max_v = minmax
         else:
-            min_v, max_v = self.minmax()
+            min_v, max_v = self.minmax
         min_v, max_v = int(min_v), int(max_v)
         subtract = np.choose(np.greater(self.data, min_v), (self.data, min_v))
         return (self.data-subtract)*int((2**16-1.)/(max_v - min_v))
