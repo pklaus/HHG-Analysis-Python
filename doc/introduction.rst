@@ -1,12 +1,14 @@
 Introduction
 ============
 
-To use this software, you should run
+The most valuable piece of code of this toolkit at this time is the command line
+utility :mod:`walk_folder`. To use it, simply run the follwing command on the
+command line (adjust your path to a measurement folder)::
 
   ./walk_folder.py /some/path/DATA/HHG_00012Ar/
 
-This will load the files in that folder and
-walk you through the measurement points.
+This will load the files in that folder and will let you walk you through the
+measurement points using the arrow keys.
 
 
 Requirements
@@ -14,8 +16,8 @@ Requirements
 
 The following requirements have to be met in order to run this software properly:
 
-* OpenCV_
-* NumPy_
+* OpenCV_ -- An open source computer vision library used to read image files and more.
+* NumPy_ -- A fast Python module for number crunching.
 
 Optional dependencies include
 
