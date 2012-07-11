@@ -1,0 +1,145 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>signalprocessing &mdash; HHG-Analysis-Python 0.8 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.8',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="HHG-Analysis-Python 0.8 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">HHG-Analysis-Python 0.8 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for signalprocessing</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot; A collection of useful signal processing functions &quot;&quot;&quot;</span>
+
+<span class="c"># wget http://public.procoders.net/sg_filter/sg_filter.py</span>
+<span class="kn">import</span> <span class="nn">sg_filter</span>
+<div class="viewcode-block" id="smooth"><a class="viewcode-back" href="../helpers.html#signalprocessing.smooth">[docs]</a><span class="k">def</span> <span class="nf">smooth</span><span class="p">(</span><span class="n">signal</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Smoothing a signal using the Savitzky–Golay filter. &quot;&quot;&quot;</span>
+    <span class="n">coeff</span> <span class="o">=</span> <span class="n">sg_filter</span><span class="o">.</span><span class="n">calc_coeff</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span><span class="o">/</span><span class="mi">500</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sg_filter</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">coeff</span><span class="p">)</span> 
+</div>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">real</span><span class="p">,</span> <span class="n">arctan</span><span class="p">,</span> <span class="n">pi</span>
+<span class="kn">from</span> <span class="nn">numpy.fft</span> <span class="kn">import</span> <span class="n">fft</span><span class="p">,</span> <span class="n">ifft</span>
+<div class="viewcode-block" id="remove_high_frequency_noise"><a class="viewcode-back" href="../helpers.html#signalprocessing.remove_high_frequency_noise">[docs]</a><span class="k">def</span> <span class="nf">remove_high_frequency_noise</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">15.</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A Low-pass filter.</span>
+<span class="sd">    See http://en.wikipedia.org/wiki/Low-pass_filter .</span>
+<span class="sd">    :param cutoff: defines the limit at which higher frequencies should be removed (from 0. to 100.).</span>
+<span class="sd">    :type cutoff: float.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cutoff_range</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span> <span class="o">*</span> <span class="n">cutoff</span> <span class="o">*</span> <span class="o">.</span><span class="mo">01</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span> <span class="o">-</span> <span class="n">cutoff</span> <span class="o">*</span> <span class="o">.</span><span class="mo">01</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">signal</span><span class="p">))</span>
+    <span class="n">spectrum</span> <span class="o">=</span> <span class="n">fft</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">spectrum_cut</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">freq</span> <span class="ow">in</span> <span class="n">spectrum</span><span class="p">:</span>
+        <span class="c">### no filter at all:</span>
+        <span class="c">#spectrum_cut.append(freq)</span>
+        <span class="c">### sharply defined range cut out:</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">cutoff_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">spectrum_cut</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">cutoff_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">spectrum_cut</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="c">### lowpass with linear cut:</span>
+            <span class="c">#spectrum_cut.append( freq * ( 2 * cutoff_range[0] - i)/( cutoff_range[1] - cutoff_range[1] ) )</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c">#spectrum_cut.append(0.0)</span>
+            <span class="n">spectrum_cut</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+        <span class="c">### arctan as transfer function</span>
+        <span class="c">#spectrum_cut.append(freq * (arctan((-i+cutoff_range[0])/cutoff_range[0]*10)/pi + .5) )</span>
+        <span class="c">### lowpass filter with sharp cutoff:</span>
+        <span class="c">#spectrum_cut.append(freq if i &lt; cutoff_range[0] else 0.0)</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">real</span><span class="p">(</span><span class="n">ifft</span><span class="p">(</span><span class="n">spectrum_cut</span><span class="p">))</span>
+</div>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="nb">sum</span>
+<div class="viewcode-block" id="calculate_sum"><a class="viewcode-back" href="../helpers.html#signalprocessing.calculate_sum">[docs]</a><span class="k">def</span> <span class="nf">calculate_sum</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">val_from</span><span class="p">,</span> <span class="n">val_to</span><span class="p">,</span> <span class="n">baseline</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A function to calculate the sum of a selection of values from which a baseline value has been substracted. &quot;&quot;&quot;</span>
+    <span class="n">cropped_signal</span> <span class="o">=</span> <span class="n">signal</span><span class="p">[</span><span class="n">val_from</span><span class="p">:</span><span class="n">val_to</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">cropped_signal</span><span class="p">)</span> <span class="o">-</span> <span class="n">baseline</span> <span class="o">*</span> <span class="p">(</span><span class="n">val_to</span><span class="o">+</span><span class="mi">1</span> <span class="o">-</span> <span class="n">val_from</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">HHG-Analysis-Python 0.8 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Philipp Klaus.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

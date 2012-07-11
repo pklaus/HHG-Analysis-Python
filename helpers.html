@@ -1,0 +1,333 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Helper Modules and Utility Functions &mdash; HHG-Analysis-Python 0.8 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.8',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="HHG-Analysis-Python 0.8 documentation" href="index.html" />
+    <link rel="prev" title="Documentation of the Classes" href="classes.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="classes.html" title="Documentation of the Classes"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">HHG-Analysis-Python 0.8 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="helper-modules-and-utility-functions">
+<h1>Helper Modules and Utility Functions<a class="headerlink" href="#helper-modules-and-utility-functions" title="Permalink to this headline">¶</a></h1>
+<p>Here is a collection of other useful modules and functions
+that come with HHG-Analysis-Python:</p>
+<div class="section" id="module-blobs">
+<span id="blobs"></span><h2>Blobs<a class="headerlink" href="#module-blobs" title="Permalink to this headline">¶</a></h2>
+<p>This module can find overflow areas in images (“blobs”).
+It makes heavy use of OpenCV.</p>
+<dl class="function">
+<dt id="blobs.find_blobs">
+<tt class="descclassname">blobs.</tt><tt class="descname">find_blobs</tt><big>(</big><em>img_data</em>, <em>verbose=False</em>, <em>min_area=None</em><big>)</big><a class="reference internal" href="_modules/blobs.html#find_blobs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#blobs.find_blobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find second level contours in 16bit images</p>
+<p>Here is an example to illustrate the contours of the blob this function can find:</p>
+<img alt="_images/blobs-contours.png" src="_images/blobs-contours.png" />
+</dd></dl>
+
+<dl class="function">
+<dt id="blobs.fix_image">
+<tt class="descclassname">blobs.</tt><tt class="descname">fix_image</tt><big>(</big><em>img</em>, <em>blobs</em><big>)</big><a class="reference internal" href="_modules/blobs.html#fix_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#blobs.fix_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function can fix images where blobs have been found using <a class="reference internal" href="#blobs.find_blobs" title="blobs.find_blobs"><tt class="xref py py-func docutils literal"><span class="pre">find_blobs()</span></tt></a>.</p>
+<p>Here is an example of what this does:</p>
+<img alt="_images/blob-fix.png" src="_images/blob-fix.png" />
+</dd></dl>
+
+<dl class="function">
+<dt id="blobs.main">
+<tt class="descclassname">blobs.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/blobs.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#blobs.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is a demonstration of how this module is being used.
+It is implemented as a command line tool. Run this module file to see how it works.</p>
+<p>It can serve for unit tests too.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-mathtools">
+<span id="mathematical-tools"></span><h2>Mathematical Tools<a class="headerlink" href="#module-mathtools" title="Permalink to this headline">¶</a></h2>
+<p>A collection of useful mathematical tools and functions.</p>
+<dl class="function">
+<dt id="mathtools.scoreatpercentile">
+<tt class="descclassname">mathtools.</tt><tt class="descname">scoreatpercentile</tt><big>(</big><em>a</em>, <em>per</em>, <em>limit=()</em><big>)</big><a class="reference internal" href="_modules/mathtools.html#scoreatpercentile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mathtools.scoreatpercentile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the score at the given <a class="reference external" href="http://en.wikipedia.org/wiki/Percentile">percentile</a> <cite>per</cite> of the sequence <cite>a</cite>.</p>
+<p>Largely the same as <a class="reference external" href="http://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.scoreatpercentile.html">http://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.scoreatpercentile.html</a> .</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-geometry">
+<span id="geometry-classes"></span><h2>Geometry Classes<a class="headerlink" href="#module-geometry" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="geometry.coordinates">
+<em class="property">class </em><tt class="descclassname">geometry.</tt><tt class="descname">coordinates</tt><big>(</big><em>x=None</em>, <em>y=None</em><big>)</big><a class="reference internal" href="_modules/geometry.html#coordinates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geometry.coordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p>2-dimensional coordinates</p>
+<dl class="method">
+<dt id="geometry.coordinates.move">
+<tt class="descname">move</tt><big>(</big><em>offset</em><big>)</big><a class="reference internal" href="_modules/geometry.html#coordinates.move"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geometry.coordinates.move" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move the coordinates by offset</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="geometry.coordinates.x">
+<tt class="descname">x</tt><em class="property"> = None</em><a class="headerlink" href="#geometry.coordinates.x" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="geometry.coordinates.y">
+<tt class="descname">y</tt><em class="property"> = None</em><a class="headerlink" href="#geometry.coordinates.y" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="geometry.rectangle">
+<em class="property">class </em><tt class="descclassname">geometry.</tt><tt class="descname">rectangle</tt><big>(</big><em>pos=None</em>, <em>dim=None</em><big>)</big><a class="reference internal" href="_modules/geometry.html#rectangle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geometry.rectangle" title="Permalink to this definition">¶</a></dt>
+<dd><p>A rectangle in 2-dimensional space.</p>
+<dl class="method">
+<dt id="geometry.rectangle.corners">
+<tt class="descname">corners</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/geometry.html#rectangle.corners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geometry.rectangle.corners" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a tuple of two corners of the rectangle.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="geometry.rectangle.dim">
+<tt class="descname">dim</tt><em class="property"> = None</em><a class="headerlink" href="#geometry.rectangle.dim" title="Permalink to this definition">¶</a></dt>
+<dd><p>The size (dimensions) of the rectangle.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="geometry.rectangle.fully_in">
+<tt class="descname">fully_in</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="_modules/geometry.html#rectangle.fully_in"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geometry.rectangle.fully_in" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests if another rectangle lies entierely in this rectangle.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="geometry.rectangle.get_rectangle_inside">
+<tt class="descname">get_rectangle_inside</tt><big>(</big><em>size</em>, <em>center</em><big>)</big><a class="reference internal" href="_modules/geometry.html#rectangle.get_rectangle_inside"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geometry.rectangle.get_rectangle_inside" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new rectangle that must be inside this rectangle.
+If it would overlap with this rectangle, it would be moved to the inside.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="geometry.rectangle.move">
+<tt class="descname">move</tt><big>(</big><em>by</em><big>)</big><a class="reference internal" href="_modules/geometry.html#rectangle.move"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geometry.rectangle.move" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move this rectangle to a different position.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="geometry.rectangle.pos">
+<tt class="descname">pos</tt><em class="property"> = None</em><a class="headerlink" href="#geometry.rectangle.pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>The position of the rectangle.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-signalprocessing">
+<span id="signal-processing"></span><h2>Signal Processing<a class="headerlink" href="#module-signalprocessing" title="Permalink to this headline">¶</a></h2>
+<p>A collection of useful signal processing functions</p>
+<dl class="function">
+<dt id="signalprocessing.calculate_sum">
+<tt class="descclassname">signalprocessing.</tt><tt class="descname">calculate_sum</tt><big>(</big><em>signal</em>, <em>val_from</em>, <em>val_to</em>, <em>baseline</em><big>)</big><a class="reference internal" href="_modules/signalprocessing.html#calculate_sum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signalprocessing.calculate_sum" title="Permalink to this definition">¶</a></dt>
+<dd><p>A function to calculate the sum of a selection of values from which a baseline value has been substracted.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="signalprocessing.remove_high_frequency_noise">
+<tt class="descclassname">signalprocessing.</tt><tt class="descname">remove_high_frequency_noise</tt><big>(</big><em>signal</em>, <em>cutoff=15.0</em><big>)</big><a class="reference internal" href="_modules/signalprocessing.html#remove_high_frequency_noise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signalprocessing.remove_high_frequency_noise" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Low-pass filter.
+See <a class="reference external" href="http://en.wikipedia.org/wiki/Low-pass_filter">http://en.wikipedia.org/wiki/Low-pass_filter</a> .
+:param cutoff: defines the limit at which higher frequencies should be removed (from 0. to 100.).
+:type cutoff: float.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="signalprocessing.smooth">
+<tt class="descclassname">signalprocessing.</tt><tt class="descname">smooth</tt><big>(</big><em>signal</em><big>)</big><a class="reference internal" href="_modules/signalprocessing.html#smooth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signalprocessing.smooth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Smoothing a signal using the Savitzky–Golay filter.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sg_filter">
+<span id="savitzkygolay-smoothing"></span><h2>Savitzky–Golay smoothing<a class="headerlink" href="#module-sg_filter" title="Permalink to this headline">¶</a></h2>
+<p>A module that implements the useful Savitzky–Golay filter.
+See <a class="reference external" href="http://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_smoothing_filter">http://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_smoothing_filter</a> .</p>
+<dl class="function">
+<dt id="sg_filter.calc_coeff">
+<tt class="descclassname">sg_filter.</tt><tt class="descname">calc_coeff</tt><big>(</big><em>num_points</em>, <em>pol_degree</em>, <em>diff_order=0</em><big>)</big><a class="reference internal" href="_modules/sg_filter.html#calc_coeff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sg_filter.calc_coeff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates filter coefficients for symmetric Savitzky–Golay filter.
+see: <a class="reference external" href="http://www.nrbook.com/a/bookcpdf/c14-8.pdf">http://www.nrbook.com/a/bookcpdf/c14-8.pdf</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>num_points</strong> (<em>int.</em>) &#8211; means that 2*num_points+1 values contribute to the smoother.</li>
+<li><strong>pol_degree</strong> (<em>int.</em>) &#8211; is degree of fitting polynomial</li>
+<li><strong>diff_order</strong> (<em>int.</em>) &#8211; is degree of implicit differentiation.
+0 means that filter results in smoothing of function.
+1 means that filter results in smoothing the first derivative of function.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">numpy.array &#8211; The coefficients for the Savitzky–Golay filter.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sg_filter.smooth">
+<tt class="descclassname">sg_filter.</tt><tt class="descname">smooth</tt><big>(</big><em>signal</em>, <em>coeff</em><big>)</big><a class="reference internal" href="_modules/sg_filter.html#smooth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sg_filter.smooth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies coefficients calculated by <a class="reference internal" href="#sg_filter.calc_coeff" title="sg_filter.calc_coeff"><tt class="xref py py-func docutils literal"><span class="pre">calc_coeff()</span></tt></a> to signal.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-keycode">
+<span id="keycodes"></span><h2>Keycodes<a class="headerlink" href="#module-keycode" title="Permalink to this headline">¶</a></h2>
+<p>Key codes for OpenCV&#8217;s cv2.waitKey()</p>
+<dl class="data">
+<dt id="keycode.KEY_DOWN">
+<tt class="descclassname">keycode.</tt><tt class="descname">KEY_DOWN</tt><em class="property"> = 63233</em><a class="headerlink" href="#keycode.KEY_DOWN" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Arrow Down key</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="keycode.KEY_ESCAPE">
+<tt class="descclassname">keycode.</tt><tt class="descname">KEY_ESCAPE</tt><em class="property"> = 27</em><a class="headerlink" href="#keycode.KEY_ESCAPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ESC key</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="keycode.KEY_LEFT">
+<tt class="descclassname">keycode.</tt><tt class="descname">KEY_LEFT</tt><em class="property"> = 63234</em><a class="headerlink" href="#keycode.KEY_LEFT" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Arrow Left key</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="keycode.KEY_RIGHT">
+<tt class="descclassname">keycode.</tt><tt class="descname">KEY_RIGHT</tt><em class="property"> = 63235</em><a class="headerlink" href="#keycode.KEY_RIGHT" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Arrow Right key</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="keycode.KEY_SPACE">
+<tt class="descclassname">keycode.</tt><tt class="descname">KEY_SPACE</tt><em class="property"> = 32</em><a class="headerlink" href="#keycode.KEY_SPACE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Space key</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="keycode.KEY_UP">
+<tt class="descclassname">keycode.</tt><tt class="descname">KEY_UP</tt><em class="property"> = 63232</em><a class="headerlink" href="#keycode.KEY_UP" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Arrow Up key</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Helper Modules and Utility Functions</a><ul>
+<li><a class="reference internal" href="#module-blobs">Blobs</a></li>
+<li><a class="reference internal" href="#module-mathtools">Mathematical Tools</a></li>
+<li><a class="reference internal" href="#module-geometry">Geometry Classes</a></li>
+<li><a class="reference internal" href="#module-signalprocessing">Signal Processing</a></li>
+<li><a class="reference internal" href="#module-sg_filter">Savitzky–Golay smoothing</a></li>
+<li><a class="reference internal" href="#module-keycode">Keycodes</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="classes.html"
+                        title="previous chapter">Documentation of the Classes</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/helpers.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="classes.html" title="Documentation of the Classes"
+             >previous</a> |</li>
+        <li><a href="index.html">HHG-Analysis-Python 0.8 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Philipp Klaus.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

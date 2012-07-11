@@ -1,0 +1,165 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sg_filter &mdash; HHG-Analysis-Python 0.8 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.8',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="HHG-Analysis-Python 0.8 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">HHG-Analysis-Python 0.8 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for sg_filter</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A module that implements the useful Savitzky–Golay filter.</span>
+<span class="sd">See http://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_smoothing_filter .</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="calc_coeff"><a class="viewcode-back" href="../helpers.html#sg_filter.calc_coeff">[docs]</a><span class="k">def</span> <span class="nf">calc_coeff</span><span class="p">(</span><span class="n">num_points</span><span class="p">,</span> <span class="n">pol_degree</span><span class="p">,</span> <span class="n">diff_order</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Calculates filter coefficients for symmetric Savitzky–Golay filter.</span>
+<span class="sd">    see: http://www.nrbook.com/a/bookcpdf/c14-8.pdf</span>
+
+<span class="sd">    :param num_points: means that 2*num_points+1 values contribute to the smoother.</span>
+<span class="sd">    :type num_points: int.</span>
+<span class="sd">    :param pol_degree: is degree of fitting polynomial</span>
+<span class="sd">    :type pol_degree: int.</span>
+<span class="sd">    :param diff_order: is degree of implicit differentiation.</span>
+<span class="sd">      0 means that filter results in smoothing of function.</span>
+<span class="sd">      1 means that filter results in smoothing the first derivative of function.</span>
+<span class="sd">    :type diff_order: int.</span>
+<span class="sd">    :returns:  numpy.array -- The coefficients for the Savitzky–Golay filter.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c"># Setup interpolation matrix. You might use other interpolation</span>
+    <span class="c"># points and maybe other functions than monomials.</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">num_points</span><span class="p">,</span> <span class="n">num_points</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">monom</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">deg</span> <span class="p">:</span> <span class="nb">pow</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">deg</span><span class="p">)</span>
+
+    <span class="n">A</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="o">*</span><span class="n">num_points</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">pol_degree</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="nb">float</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">num_points</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pol_degree</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">monom</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">j</span><span class="p">)</span>
+
+    <span class="c"># calculate diff_order-th row of inv(A^T A)</span>
+    <span class="n">ATA</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">transpose</span><span class="p">(),</span> <span class="n">A</span><span class="p">)</span>
+    <span class="n">rhs</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">((</span><span class="n">pol_degree</span><span class="o">+</span><span class="mi">1</span><span class="p">,),</span> <span class="nb">float</span><span class="p">)</span>
+    <span class="n">rhs</span><span class="p">[</span><span class="n">diff_order</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="n">diff_order</span>
+    <span class="n">wvec</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">ATA</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>
+
+    <span class="c"># calculate filter-coefficients</span>
+    <span class="n">coeff</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">wvec</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">coeff</span>
+</div>
+<div class="viewcode-block" id="smooth"><a class="viewcode-back" href="../helpers.html#sg_filter.smooth">[docs]</a><span class="k">def</span> <span class="nf">smooth</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">coeff</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Applies coefficients calculated by :py:func:`calc_coeff` to signal. &quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">coeff</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">convolve</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">coeff</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="n">N</span><span class="p">:</span><span class="o">-</span><span class="n">N</span><span class="p">]</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+
+    <span class="k">print</span> <span class="s">&quot;Sample run to demonstrate the SG Filter&quot;</span>
+    <span class="n">x</span><span class="o">=</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">10.</span><span class="p">,</span> <span class="o">.</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">y</span><span class="o">=</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">coeff</span> <span class="o">=</span> <span class="n">calc_coeff</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">diff_order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">yPrime</span><span class="o">=</span><span class="n">smooth</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">coeff</span><span class="p">)</span>
+
+    <span class="c"># calibrate due to unknown correction factor:</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">dy</span> <span class="o">=</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  <span class="c"># exakt</span>
+    <span class="n">corrfac</span> <span class="o">=</span> <span class="n">dy</span><span class="p">[</span><span class="n">N</span><span class="o">/</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="n">yPrime</span><span class="p">[</span><span class="n">N</span><span class="o">/</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="kn">import</span> <span class="nn">pylab</span>
+    <span class="n">pylab</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">pylab</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">corrfac</span><span class="o">*</span><span class="n">yPrime</span><span class="p">)</span>
+    <span class="n">pylab</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">HHG-Analysis-Python 0.8 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Philipp Klaus.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

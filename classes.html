@@ -1,0 +1,278 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Documentation of the Classes &mdash; HHG-Analysis-Python 0.8 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.8',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="HHG-Analysis-Python 0.8 documentation" href="index.html" />
+    <link rel="next" title="Helper Modules and Utility Functions" href="helpers.html" />
+    <link rel="prev" title="Command Line Tools" href="command-line.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="helpers.html" title="Helper Modules and Utility Functions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="command-line.html" title="Command Line Tools"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">HHG-Analysis-Python 0.8 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="documentation-of-the-classes">
+<h1>Documentation of the Classes<a class="headerlink" href="#documentation-of-the-classes" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-dataformat">
+<span id="reading-measurements"></span><h2>Reading Measurements<a class="headerlink" href="#module-dataformat" title="Permalink to this headline">¶</a></h2>
+<p>This module holds classes and helper functions to represent the data format
+of the measurements carried out with the HHG spectrometer.</p>
+<p>It helps reading in the data from the folders and extracts information from the
+implicit data structure found in the sets of</p>
+<ul class="simple">
+<li>XML</li>
+<li>and TIFF files.</li>
+</ul>
+<div class="section" id="the-measurement-class">
+<h3>The Measurement class<a class="headerlink" href="#the-measurement-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="dataformat.Measurement">
+<em class="property">class </em><tt class="descclassname">dataformat.</tt><tt class="descname">Measurement</tt><big>(</big><em>folder</em><big>)</big><a class="reference internal" href="_modules/dataformat.html#Measurement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataformat.Measurement" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class can hold a complete measurement taken with the HHG spectrometer.</p>
+<p>It holds a list of the individual <a class="reference internal" href="#dataformat.MeasurementPoint" title="dataformat.MeasurementPoint"><tt class="xref py py-class docutils literal"><span class="pre">MeasurementPoint</span></tt></a> instances.</p>
+<dl class="method">
+<dt id="dataformat.Measurement.after_process">
+<tt class="descname">after_process</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/dataformat.html#Measurement.after_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataformat.Measurement.after_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate properties derived from all the measurement points.</p>
+<p>If they are expensive to calculate, their calculation should be prepared in
+the instantiation process of the <a class="reference internal" href="#dataformat.MeasurementPoint" title="dataformat.MeasurementPoint"><tt class="xref py py-class docutils literal"><span class="pre">MeasurementPoint</span></tt></a> class.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="dataformat.Measurement.other_files_for_xml">
+<em class="property">static </em><tt class="descname">other_files_for_xml</tt><big>(</big><em>xml_filename</em><big>)</big><a class="reference internal" href="_modules/dataformat.html#Measurement.other_files_for_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataformat.Measurement.other_files_for_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the names of the image and background files that belong to a certain xml file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataformat.Measurement.read_measurement">
+<tt class="descname">read_measurement</tt><big>(</big><em>folder</em><big>)</big><a class="reference internal" href="_modules/dataformat.html#Measurement.read_measurement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataformat.Measurement.read_measurement" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function contains the logic to read in measurement folders.
+First, it finds out what it has to do and creates a list of instructions.
+Then it starts to process those jobs in parallel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>folder</strong> (<em>str.</em>) &#8211; The path to the folder that contains the measurment.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="the-measurementpoint-class">
+<h3>The MeasurementPoint class<a class="headerlink" href="#the-measurementpoint-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="dataformat.MeasurementPoint">
+<em class="property">class </em><tt class="descclassname">dataformat.</tt><tt class="descname">MeasurementPoint</tt><big>(</big><em>date</em>, <em>avgnum</em>, <em>xmlfile</em>, <em>imgfile</em>, <em>bgfile=None</em><big>)</big><a class="reference internal" href="_modules/dataformat.html#MeasurementPoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataformat.MeasurementPoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class holds all data associated with a single measurement point.
+This includes an XML file, the image from the spectrometer and a
+background reference image.</p>
+<dl class="method">
+<dt id="dataformat.MeasurementPoint.display_image">
+<tt class="descname">display_image</tt><big>(</big><em>rescale=False</em>, <em>rescale_to_global_minmax=False</em>, <em>rescale_to_percentile_and_max=False</em><big>)</big><a class="reference internal" href="_modules/dataformat.html#MeasurementPoint.display_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataformat.MeasurementPoint.display_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Displayes the spectrometer image using OpenCV&#8217;s function <tt class="xref py py-func docutils literal"><span class="pre">cv2.imshow()</span></tt></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataformat.MeasurementPoint.dump_xml_structure">
+<tt class="descname">dump_xml_structure</tt><big>(</big><em>level=0</em><big>)</big><a class="reference internal" href="_modules/dataformat.html#MeasurementPoint.dump_xml_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataformat.MeasurementPoint.dump_xml_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a human readable dump of the xml structure.</p>
+<p>Implemented as a recursive function.
+Therefore call without providing the <cite>level</cite> argument.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataformat.MeasurementPoint.read_image">
+<tt class="descname">read_image</tt><big>(</big><em>imgfile</em>, <em>bgfile=None</em><big>)</big><a class="reference internal" href="_modules/dataformat.html#MeasurementPoint.read_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataformat.MeasurementPoint.read_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>imgfile and bgfile should be (&#8216;/path/to/folder&#8217;,&#8217;filename.tif&#8217;)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataformat.MeasurementPoint.read_xml">
+<tt class="descname">read_xml</tt><big>(</big><em>xmlfile</em><big>)</big><a class="reference internal" href="_modules/dataformat.html#MeasurementPoint.read_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataformat.MeasurementPoint.read_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>xmlfile should be (&#8216;/path/to/folder&#8217;,&#8217;filename.xml&#8217;)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-tiff">
+<span id="the-tiff-module"></span><h2>The tiff Module<a class="headerlink" href="#module-tiff" title="Permalink to this headline">¶</a></h2>
+<p>A module to leverage the usage of TIFF images.</p>
+<div class="section" id="tiff-a-class-to-read-16bit-tiffs">
+<h3>TIFF - A class to read 16bit TIFFs<a class="headerlink" href="#tiff-a-class-to-read-16bit-tiffs" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="tiff.TIFF">
+<em class="property">class </em><tt class="descclassname">tiff.</tt><tt class="descname">TIFF</tt><big>(</big><em>filename=None</em><big>)</big><a class="reference internal" href="_modules/tiff.html#TIFF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tiff.TIFF" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Class that helps reading TIFF image files,
+especially 16 bit grayscale images.
+It also contains frequently used operations on those images.</p>
+<p>The image array data can be accessed via the property <a class="reference internal" href="#tiff.TIFF.data" title="tiff.TIFF.data"><tt class="xref py py-attr docutils literal"><span class="pre">TIFF.data</span></tt></a>.</p>
+<dl class="attribute">
+<dt id="tiff.TIFF.data">
+<tt class="descname">data</tt><a class="headerlink" href="#tiff.TIFF.data" title="Permalink to this definition">¶</a></dt>
+<dd><p>The property holding the image data itself in the form of a <tt class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></tt>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tiff.TIFF.minmax">
+<tt class="descname">minmax</tt><a class="reference internal" href="_modules/tiff.html#TIFF.minmax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tiff.TIFF.minmax" title="Permalink to this definition">¶</a></dt>
+<dd><p>A tuple containing the minimum and maximum pixel values in the image.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tiff.TIFF.percentiles">
+<tt class="descname">percentiles</tt><big>(</big><em>percentages</em><big>)</big><a class="reference internal" href="_modules/tiff.html#TIFF.percentiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tiff.TIFF.percentiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates percentiles over all pixel values of the image.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tiff.TIFF.read">
+<tt class="descname">read</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/tiff.html#TIFF.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tiff.TIFF.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads the image file using OpenCV.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tiff.TIFF.rescale">
+<tt class="descname">rescale</tt><big>(</big><em>minmax=None</em><big>)</big><a class="reference internal" href="_modules/tiff.html#TIFF.rescale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tiff.TIFF.rescale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get image data with changed intensity scaling.</p>
+<p>This method returns image data where the minimum and maximum pixel values
+are being rescaled to the given values.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tiff.TIFF.update">
+<tt class="descname">update</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tiff.html#TIFF.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tiff.TIFF.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates properties of the image like its colour depth or the dimensions.</p>
+<p>This method is being called whenever the property TIFF.data is being changed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Documentation of the Classes</a><ul>
+<li><a class="reference internal" href="#module-dataformat">Reading Measurements</a><ul>
+<li><a class="reference internal" href="#the-measurement-class">The Measurement class</a></li>
+<li><a class="reference internal" href="#the-measurementpoint-class">The MeasurementPoint class</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-tiff">The tiff Module</a><ul>
+<li><a class="reference internal" href="#tiff-a-class-to-read-16bit-tiffs">TIFF - A class to read 16bit TIFFs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="command-line.html"
+                        title="previous chapter">Command Line Tools</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="helpers.html"
+                        title="next chapter">Helper Modules and Utility Functions</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/classes.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="helpers.html" title="Helper Modules and Utility Functions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="command-line.html" title="Command Line Tools"
+             >previous</a> |</li>
+        <li><a href="index.html">HHG-Analysis-Python 0.8 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Philipp Klaus.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

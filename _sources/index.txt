@@ -1,20 +1,22 @@
-.. HHG Analysis documentation master file, created by
-   sphinx-quickstart on Wed Jul 11 10:37:57 2012.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. created by sphinx-quickstart on Wed Jul 11 10:37:57 2012.
 
-Welcome to HHG Analysis's documentation!
-========================================
+Welcome to HHG-Analysis-Python's documentation!
+===============================================
+
+This documentation helps you to get started with HHG-Analysis-Python.
+
+This toolkit was made to read, analyse and calibrate measurements taken with
+the XUV spectrometer to analyse higher harmonics.
 
 Contents:
 
 .. toctree::
    :maxdepth: 2
 
-   dataformat
-   tiff
-
-This documentation can help you to get started with the HHG analysis implemented in Python.
+   introduction
+   command-line
+   classes
+   helpers
 
 Indices and tables
 ==================

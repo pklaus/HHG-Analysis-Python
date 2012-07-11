@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>dataformat &mdash; HHG Analysis 0.8 documentation</title>
+    <title>dataformat &mdash; HHG-Analysis-Python 0.8 documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="HHG Analysis 0.8 documentation" href="../index.html" />
+    <link rel="top" title="HHG-Analysis-Python 0.8 documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">HHG Analysis 0.8 documentation</a> &raquo;</li>
+        <li><a href="../index.html">HHG-Analysis-Python 0.8 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -51,6 +51,20 @@
             
   <h1>Source code for dataformat</h1><div class="highlight"><pre>
 <span class="c">#!/usr/bin/env python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">This module holds classes and helper functions to represent the data format</span>
+<span class="sd">of the measurements carried out with the HHG spectrometer.</span>
+
+<span class="sd">It helps reading in the data from the folders and extracts information from the</span>
+<span class="sd">implicit data structure found in the sets of</span>
+
+<span class="sd">- XML</span>
+<span class="sd">- and TIFF files.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">xml.etree.ElementTree</span> <span class="kn">import</span> <span class="n">parse</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">array</span>
@@ -65,7 +79,12 @@
 <span class="kn">import</span> <span class="nn">time</span>
 
 
-<div class="viewcode-block" id="Measurement"><a class="viewcode-back" href="../dataformat.html#dataformat.Measurement">[docs]</a><span class="k">class</span> <span class="nc">Measurement</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Measurement"><a class="viewcode-back" href="../classes.html#dataformat.Measurement">[docs]</a><span class="k">class</span> <span class="nc">Measurement</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class can hold a complete measurement taken with the HHG spectrometer.</span>
+
+<span class="sd">    It holds a list of the individual :class:`dataformat.MeasurementPoint` instances.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">avg_folder_match</span> <span class="o">=</span> <span class="s">r&#39;avg_(\d)&#39;</span>
     <span class="n">timestamp_match</span> <span class="o">=</span> <span class="s">r&#39;(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})f(\d{2})&#39;</span>
     <span class="n">image_match</span> <span class="o">=</span> <span class="s">r&#39;HHG_&#39;</span> <span class="o">+</span> <span class="n">timestamp_match</span> <span class="o">+</span> <span class="s">&#39;_\.tif&#39;</span>
@@ -76,14 +95,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">read_measurement</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Measurement.other_files_for_xml"><a class="viewcode-back" href="../dataformat.html#dataformat.Measurement.other_files_for_xml">[docs]</a>    <span class="k">def</span> <span class="nf">other_files_for_xml</span><span class="p">(</span><span class="n">xml_filename</span><span class="p">):</span>
+<div class="viewcode-block" id="Measurement.other_files_for_xml"><a class="viewcode-back" href="../classes.html#dataformat.Measurement.other_files_for_xml">[docs]</a>    <span class="k">def</span> <span class="nf">other_files_for_xml</span><span class="p">(</span><span class="n">xml_filename</span><span class="p">):</span>
         <span class="s">&quot;Returns the names of the image and background files that belong to a certain xml file.&quot;</span>
         <span class="k">return</span> <span class="n">xml_filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;.xml&#39;</span><span class="p">,</span><span class="s">&#39;.tif&#39;</span><span class="p">),</span> <span class="n">xml_filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;.xml&#39;</span><span class="p">,</span><span class="s">&#39;bg.tif&#39;</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="Measurement.read_measurement"><a class="viewcode-back" href="../dataformat.html#dataformat.Measurement.read_measurement">[docs]</a>    <span class="k">def</span> <span class="nf">read_measurement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder</span><span class="p">):</span>
+<div class="viewcode-block" id="Measurement.read_measurement"><a class="viewcode-back" href="../classes.html#dataformat.Measurement.read_measurement">[docs]</a>    <span class="k">def</span> <span class="nf">read_measurement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function contains the logic to read in measurement folders.</span>
+<span class="sd">        First, it finds out what it has to do and creates a list of instructions.</span>
+<span class="sd">        Then it starts to process those jobs in parallel.</span>
+
 <span class="sd">        :param folder: The path to the folder that contains the measurment.</span>
-<span class="sd">        :type path: str.</span>
+<span class="sd">        :type folder: str.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">avg_folders</span> <span class="o">=</span> <span class="p">[]</span>
@@ -136,10 +159,11 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">after_process</span><span class="p">()</span>
 </div>
-<div class="viewcode-block" id="Measurement.after_process"><a class="viewcode-back" href="../dataformat.html#dataformat.Measurement.after_process">[docs]</a>    <span class="k">def</span> <span class="nf">after_process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Calculate overall properties</span>
+<div class="viewcode-block" id="Measurement.after_process"><a class="viewcode-back" href="../classes.html#dataformat.Measurement.after_process">[docs]</a>    <span class="k">def</span> <span class="nf">after_process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate properties derived from all the measurement points.</span>
+
 <span class="sd">        If they are expensive to calculate, their calculation should be prepared in</span>
-<span class="sd">        the creation process of the process_MeasurementPoint() call.</span>
+<span class="sd">        the instantiation process of the :class:`MeasurementPoint` class.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">print</span> <span class="s">&quot;Starting after-processing.&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">minmax</span> <span class="o">=</span> <span class="p">(</span> <span class="nb">min</span><span class="p">([</span><span class="n">mp</span><span class="o">.</span><span class="n">minmax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">mp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurementPoints</span><span class="p">]),</span>
@@ -148,14 +172,24 @@
         <span class="k">for</span> <span class="n">mp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurementPoints</span><span class="p">:</span>
             <span class="n">mp</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span>
 </div></div>
-<div class="viewcode-block" id="process_MeasurementPoint_Wrapper"><a class="viewcode-back" href="../dataformat.html#dataformat.process_MeasurementPoint_Wrapper">[docs]</a><span class="k">def</span> <span class="nf">process_MeasurementPoint_Wrapper</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">process_MeasurementPoint_QueueWrapper</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function wraps calls to :func:`process_MeasurementPoint`</span>
+<span class="sd">    and tells a queue when it&#39;s share is done.</span>
+<span class="sd">    It is made to be used as callback for the :py:module:`multiprocessing` module if you want parallel processing.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">instructions</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">queue</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">retval</span> <span class="o">=</span> <span class="n">process_MeasurementPoint</span><span class="p">(</span><span class="n">instructions</span><span class="p">)</span>
     <span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">instructions</span><span class="p">[</span><span class="s">&#39;f&#39;</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">retval</span>
-</div>
-<div class="viewcode-block" id="process_MeasurementPoint"><a class="viewcode-back" href="../dataformat.html#dataformat.process_MeasurementPoint">[docs]</a><span class="k">def</span> <span class="nf">process_MeasurementPoint</span><span class="p">(</span><span class="n">instructions</span><span class="p">):</span>
+
+<span class="k">def</span> <span class="nf">process_MeasurementPoint</span><span class="p">(</span><span class="n">instructions</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a function that can be called for every MeasurementPoint</span>
+<span class="sd">    to be be processed according to the &#39;instructions&#39;.</span>
+<span class="sd">    This leverages the parallel processing of those measurement points.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">image_file</span><span class="p">,</span> <span class="n">bg_file</span> <span class="o">=</span> <span class="n">Measurement</span><span class="o">.</span><span class="n">other_files_for_xml</span><span class="p">(</span><span class="n">instructions</span><span class="p">[</span><span class="s">&#39;f&#39;</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">MeasurementPoint</span><span class="p">(</span>
         <span class="n">instructions</span><span class="p">[</span><span class="s">&#39;date&#39;</span><span class="p">],</span>
@@ -164,8 +198,13 @@
         <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">instructions</span><span class="p">[</span><span class="s">&#39;d&#39;</span><span class="p">],</span> <span class="n">image_file</span><span class="p">),</span>
         <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">instructions</span><span class="p">[</span><span class="s">&#39;d&#39;</span><span class="p">],</span> <span class="n">bg_file</span><span class="p">),</span>
         <span class="p">)</span>
-</div>
-<div class="viewcode-block" id="MeasurementPoint"><a class="viewcode-back" href="../dataformat.html#dataformat.MeasurementPoint">[docs]</a><span class="k">class</span> <span class="nc">MeasurementPoint</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MeasurementPoint"><a class="viewcode-back" href="../classes.html#dataformat.MeasurementPoint">[docs]</a><span class="k">class</span> <span class="nc">MeasurementPoint</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class holds all data associated with a single measurement point.</span>
+<span class="sd">    This includes an XML file, the image from the spectrometer and a</span>
+<span class="sd">    background reference image.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">PD_SCOPE_CHANNEL</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">ION_SCOPE_CHANNEL</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">collection</span> <span class="o">=</span> <span class="bp">None</span>
@@ -175,33 +214,34 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">avgnum</span> <span class="o">=</span> <span class="n">avgnum</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">read_xml</span><span class="p">(</span><span class="n">xmlfile</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">read_image</span><span class="p">(</span><span class="n">imgfile</span><span class="p">,</span><span class="n">bgfile</span><span class="p">)</span>
-<div class="viewcode-block" id="MeasurementPoint.read_xml"><a class="viewcode-back" href="../dataformat.html#dataformat.MeasurementPoint.read_xml">[docs]</a>    <span class="k">def</span> <span class="nf">read_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xmlfile</span><span class="p">):</span>
+<div class="viewcode-block" id="MeasurementPoint.read_xml"><a class="viewcode-back" href="../classes.html#dataformat.MeasurementPoint.read_xml">[docs]</a>    <span class="k">def</span> <span class="nf">read_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xmlfile</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; xmlfile should be (&#39;/path/to/folder&#39;,&#39;filename.xml&#39;) &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">xmlfile</span> <span class="o">=</span> <span class="n">xmlfile</span>
         <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">xmlfile</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">)</span>
         <span class="n">tree</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">xml</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
         <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
-<div class="viewcode-block" id="MeasurementPoint.read_image"><a class="viewcode-back" href="../dataformat.html#dataformat.MeasurementPoint.read_image">[docs]</a>    <span class="k">def</span> <span class="nf">read_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imgfile</span><span class="p">,</span> <span class="n">bgfile</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="MeasurementPoint.read_image"><a class="viewcode-back" href="../classes.html#dataformat.MeasurementPoint.read_image">[docs]</a>    <span class="k">def</span> <span class="nf">read_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imgfile</span><span class="p">,</span> <span class="n">bgfile</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; imgfile and bgfile should be (&#39;/path/to/folder&#39;,&#39;filename.xml&#39;) &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">imgfile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bgfile</span> <span class="o">=</span> <span class="n">imgfile</span><span class="p">,</span> <span class="n">bgfile</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">img</span> <span class="o">=</span> <span class="n">TIFF</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">imgfile</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">bgfile</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">data</span> <span class="o">-=</span> <span class="n">TIFF</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bgfile</span><span class="p">))</span><span class="o">.</span><span class="n">data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">minmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">minmax</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">minmax</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">percentiles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">percentiles</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">99</span><span class="p">,</span><span class="mf">99.995</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">blobs</span> <span class="o">=</span> <span class="n">find_blobs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div>
-<div class="viewcode-block" id="MeasurementPoint.display_image"><a class="viewcode-back" href="../dataformat.html#dataformat.MeasurementPoint.display_image">[docs]</a>    <span class="k">def</span> <span class="nf">display_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rescale</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">rescale_to_global_minmax</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">rescale_to_percentile_and_max</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="MeasurementPoint.display_image"><a class="viewcode-back" href="../classes.html#dataformat.MeasurementPoint.display_image">[docs]</a>    <span class="k">def</span> <span class="nf">display_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rescale</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">rescale_to_global_minmax</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">rescale_to_percentile_and_max</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Displayes the spectrometer image using OpenCV&#39;s function :py:func:`cv2.imshow` &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">rescale</span><span class="p">:</span>
             <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span>
             <span class="k">if</span> <span class="n">rescale_to_global_minmax</span><span class="p">:</span>
                 <span class="k">print</span><span class="p">(</span><span class="s">&quot;Rescaling to global min and max values (</span><span class="si">%d</span><span class="s">,</span><span class="si">%d</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">minmax</span><span class="p">)</span>
                 <span class="n">img_data</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">rescale</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">minmax</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">rescale_to_percentile_and_max</span><span class="p">:</span>
-                <span class="k">print</span><span class="p">(</span><span class="s">&quot;Rescaling image using 5 percent percentile to local maximum value: (</span><span class="si">%d</span><span class="s">,</span><span class="si">%d</span><span class="s">).&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">percentiles</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">i</span><span class="o">.</span><span class="n">minmax</span><span class="p">()[</span><span class="mi">1</span><span class="p">]))</span>
-                <span class="n">img_data</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">rescale</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">percentiles</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">i</span><span class="o">.</span><span class="n">minmax</span><span class="p">()[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;Rescaling image using 5 percent percentile to local maximum value: (</span><span class="si">%d</span><span class="s">,</span><span class="si">%d</span><span class="s">).&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">percentiles</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">i</span><span class="o">.</span><span class="n">minmax</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="n">img_data</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">rescale</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">percentiles</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">i</span><span class="o">.</span><span class="n">minmax</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">img_data</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">rescale</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">minmax</span><span class="p">())</span>
+                <span class="n">img_data</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">rescale</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">minmax</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">img_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">data</span>
         <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s">&#39;test&#39;</span><span class="p">,</span><span class="n">img_data</span><span class="p">)</span>
@@ -209,7 +249,8 @@
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s">&quot;MeasurementPoint: (date: </span><span class="si">%s</span><span class="s">, xml: </span><span class="si">%s</span><span class="s">, image: </span><span class="si">%s</span><span class="s">, bgimage: </span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xmlfile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">imgfile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bgfile</span><span class="p">)</span>
 
-<div class="viewcode-block" id="MeasurementPoint.dump_xml_structure"><a class="viewcode-back" href="../dataformat.html#dataformat.MeasurementPoint.dump_xml_structure">[docs]</a>    <span class="k">def</span> <span class="nf">dump_xml_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="MeasurementPoint.dump_xml_structure"><a class="viewcode-back" href="../classes.html#dataformat.MeasurementPoint.dump_xml_structure">[docs]</a>    <span class="k">def</span> <span class="nf">dump_xml_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns a human readable dump of the xml structure. Implemented as a recursive function. &quot;&quot;&quot;</span>
         <span class="n">output</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
         <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="p">:</span>
             <span class="n">output</span> <span class="o">+=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;--&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">level</span><span class="p">)])</span>
@@ -225,28 +266,28 @@
             <span class="n">output</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dump_xml_structure</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">level</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">output</span>
 </div>
-<div class="viewcode-block" id="MeasurementPoint.get_stage_positions"><a class="viewcode-back" href="../dataformat.html#dataformat.MeasurementPoint.get_stage_positions">[docs]</a>    <span class="k">def</span> <span class="nf">get_stage_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_stage_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-</div>
-<div class="viewcode-block" id="MeasurementPoint.get_photodiode_scope_channel"><a class="viewcode-back" href="../dataformat.html#dataformat.MeasurementPoint.get_photodiode_scope_channel">[docs]</a>    <span class="k">def</span> <span class="nf">get_photodiode_scope_channel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">get_photodiode_scope_channel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_scope_channel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PD_SCOPE_CHANNEL</span><span class="p">)</span>
-</div>
-<div class="viewcode-block" id="MeasurementPoint.get_ion_scope_channel"><a class="viewcode-back" href="../dataformat.html#dataformat.MeasurementPoint.get_ion_scope_channel">[docs]</a>    <span class="k">def</span> <span class="nf">get_ion_scope_channel</span><span class="p">(</span><span class="n">run</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">get_ion_scope_channel</span><span class="p">(</span><span class="n">run</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_scope_channel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ION_SCOPE_CHANNEL</span><span class="p">)</span>
-</div>
-<div class="viewcode-block" id="MeasurementPoint.get_scope_channel"><a class="viewcode-back" href="../dataformat.html#dataformat.MeasurementPoint.get_scope_channel">[docs]</a>    <span class="k">def</span> <span class="nf">get_scope_channel</span><span class="p">(</span><span class="n">run</span><span class="p">,</span> <span class="n">channel_no</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">get_scope_channel</span><span class="p">(</span><span class="n">run</span><span class="p">,</span> <span class="n">channel_no</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">scope</span> <span class="ow">in</span> <span class="n">run</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">scope</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s">&#39;NI_TCP_Scope&#39;</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">scope</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">channel</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s">&#39;CH&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">channel_no</span><span class="p">):</span>
                         <span class="n">data</span> <span class="o">=</span> <span class="n">channel</span><span class="o">.</span><span class="n">text</span>
                         <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">split</span><span class="p">()]</span>
-                        <span class="k">return</span> <span class="n">data</span></div>
-<div class="viewcode-block" id="MeasurementPoint.calculate_ion_signal"><a class="viewcode-back" href="../dataformat.html#dataformat.MeasurementPoint.calculate_ion_signal">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_ion_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="n">data</span>
+    <span class="k">def</span> <span class="nf">calculate_ion_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">ion_signal_point</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="k">for</span> <span class="n">ion_signal_point</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ion_scope_channel</span><span class="p">():</span>
             <span class="n">ion_signal</span> <span class="o">+=</span> <span class="n">ion_signal_point</span>
-        <span class="k">return</span> <span class="n">ion_signal</span></div></div>
+        <span class="k">return</span> <span class="n">ion_signal</span></div>
 </pre></div>
 
           </div>
@@ -280,7 +321,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">HHG Analysis 0.8 documentation</a> &raquo;</li>
+        <li><a href="../index.html">HHG-Analysis-Python 0.8 documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>tiff &mdash; HHG Analysis 0.8 documentation</title>
+    <title>tiff &mdash; HHG-Analysis-Python 0.8 documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="HHG Analysis 0.8 documentation" href="../index.html" />
+    <link rel="top" title="HHG-Analysis-Python 0.8 documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">HHG Analysis 0.8 documentation</a> &raquo;</li>
+        <li><a href="../index.html">HHG-Analysis-Python 0.8 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -51,8 +51,9 @@
             
   <h1>Source code for tiff</h1><div class="highlight"><pre>
 <span class="c">#!/usr/bin/env python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
 
-<span class="sd">&quot;&quot;&quot;@package tiff</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">A module to leverage the usage of TIFF images.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
@@ -60,15 +61,12 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">mathtools</span> <span class="kn">import</span> <span class="n">scoreatpercentile</span>
 
-<div class="viewcode-block" id="TIFF"><a class="viewcode-back" href="../tiff.html#tiff.TIFF">[docs]</a><span class="k">class</span> <span class="nc">TIFF</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="TIFF"><a class="viewcode-back" href="../classes.html#tiff.TIFF">[docs]</a><span class="k">class</span> <span class="nc">TIFF</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A Class that helps reading TIFF image files,</span>
 <span class="sd">    especially 16 bit grayscale images.</span>
-
 <span class="sd">    It also contains frequently used operations on those images.</span>
 
-<span class="sd">    The image array data can be accessed via the property TIFF.data</span>
-
-<span class="sd">    @var __data This is where the image data is actually stored. Use the property .data to access it.</span>
+<span class="sd">    The image array data can be accessed via the property :py:attr:`TIFF.data`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">depth_map</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;uint8&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s">&#39;uint16&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="s">&#39;uint32&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span> <span class="s">&#39;uint64&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">}</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -77,7 +75,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-<div class="viewcode-block" id="TIFF.read"><a class="viewcode-back" href="../tiff.html#tiff.TIFF.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="TIFF.read"><a class="viewcode-back" href="../classes.html#tiff.TIFF.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Reads the image file using OpenCV.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span></div>
@@ -88,13 +86,14 @@
         <span class="c">#self.filename = None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
     <span class="n">data</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_data</span><span class="p">,</span> <span class="n">set_data</span><span class="p">)</span>
-<div class="viewcode-block" id="TIFF.update"><a class="viewcode-back" href="../tiff.html#tiff.TIFF.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The property holding the image data itself in the form of a :class:`numpy.ndarray`.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="TIFF.update"><a class="viewcode-back" href="../classes.html#tiff.TIFF.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Updates properties of the image like its colour depth or the dimensions.</span>
 
 <span class="sd">        This method is being called whenever the property TIFF.data is being changed.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">depth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth_map</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)]</span></div>
-<div class="viewcode-block" id="TIFF.percentiles"><a class="viewcode-back" href="../tiff.html#tiff.TIFF.percentiles">[docs]</a>    <span class="k">def</span> <span class="nf">percentiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">percentages</span><span class="p">):</span>
+<div class="viewcode-block" id="TIFF.percentiles"><a class="viewcode-back" href="../classes.html#tiff.TIFF.percentiles">[docs]</a>    <span class="k">def</span> <span class="nf">percentiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">percentages</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Calculates percentiles over all pixel values of the image.&quot;&quot;&quot;</span>
         <span class="n">percentiles</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
@@ -102,21 +101,22 @@
         <span class="k">for</span> <span class="n">percentage</span> <span class="ow">in</span> <span class="n">percentages</span><span class="p">:</span>
             <span class="n">percentiles</span><span class="p">[</span><span class="n">percentage</span><span class="p">]</span> <span class="o">=</span> <span class="n">scoreatpercentile</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">percentage</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">percentiles</span></div>
-<div class="viewcode-block" id="TIFF.minmax"><a class="viewcode-back" href="../tiff.html#tiff.TIFF.minmax">[docs]</a>    <span class="k">def</span> <span class="nf">minmax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get the minimum and maximum pixel values in the image.&quot;&quot;&quot;</span>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="TIFF.minmax"><a class="viewcode-back" href="../classes.html#tiff.TIFF.minmax">[docs]</a>    <span class="k">def</span> <span class="nf">minmax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A tuple containing the minimum and maximum pixel values in the image.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">max</span><span class="p">()</span></div>
-<div class="viewcode-block" id="TIFF.rescale"><a class="viewcode-back" href="../tiff.html#tiff.TIFF.rescale">[docs]</a>    <span class="k">def</span> <span class="nf">rescale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minmax</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="TIFF.rescale"><a class="viewcode-back" href="../classes.html#tiff.TIFF.rescale">[docs]</a>    <span class="k">def</span> <span class="nf">rescale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minmax</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get image data with changed intensity scaling.</span>
-<span class="sd">        </span>
+
 <span class="sd">        This method returns image data where the minimum and maximum pixel values</span>
 <span class="sd">        are being rescaled to the given values.</span>
-<span class="sd">        </span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">under</span><span class="o">=</span><span class="s">&#39;print&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">minmax</span><span class="p">:</span>
             <span class="n">min_v</span><span class="p">,</span> <span class="n">max_v</span> <span class="o">=</span> <span class="n">minmax</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">min_v</span><span class="p">,</span> <span class="n">max_v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">minmax</span><span class="p">()</span>
+            <span class="n">min_v</span><span class="p">,</span> <span class="n">max_v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">minmax</span>
         <span class="n">min_v</span><span class="p">,</span> <span class="n">max_v</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">min_v</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_v</span><span class="p">)</span>
         <span class="n">subtract</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">choose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">greater</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">min_v</span><span class="p">),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">min_v</span><span class="p">))</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">-</span><span class="n">subtract</span><span class="p">)</span><span class="o">*</span><span class="nb">int</span><span class="p">((</span><span class="mi">2</span><span class="o">**</span><span class="mi">16</span><span class="o">-</span><span class="mf">1.</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">max_v</span> <span class="o">-</span> <span class="n">min_v</span><span class="p">))</span></div>
@@ -169,7 +169,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">HHG Analysis 0.8 documentation</a> &raquo;</li>
+        <li><a href="../index.html">HHG-Analysis-Python 0.8 documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
