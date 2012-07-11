@@ -13,3 +13,5 @@ ToDo
           <source src="_static/screencast.ogv" type="video/ogg" />
           Your browser does not support the video tag.
         </video>
+
+- Add the module to the titles of the module documenation headers
