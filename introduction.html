@@ -91,10 +91,19 @@ walk you through the measurement points.</p>
 <div class="section" id="installation-of-the-requirements">
 <h2>Installation of the Requirements<a class="headerlink" href="#installation-of-the-requirements" title="Permalink to this headline">¶</a></h2>
 <p>On a Mac:</p>
-<ol class="arabic simple">
-<li>Install <a class="reference external" href="http://mxcl.github.com/homebrew/">Homebrew</a></li>
-<li>Install OpenCV like this: <tt class="docutils literal"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">opencv</span></tt></li>
-<li>Install Numpy: <tt class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">numpy</span></tt></li>
+<ol class="arabic">
+<li><p class="first">Install <a class="reference external" href="http://mxcl.github.com/homebrew/">Homebrew</a></p>
+</li>
+<li><p class="first">Install Numpy: <tt class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">numpy</span></tt></p>
+</li>
+<li><p class="first">Install OpenCV like this: <tt class="docutils literal"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">opencv</span></tt></p>
+</li>
+<li><p class="first">Add these lines to your <tt class="docutils literal"><span class="pre">~/.bashrc</span></tt> to let Python find it:</p>
+<div class="highlight-python"><pre># needed for OpenCV:
+PYTHONPATH="/usr/local/lib/python2.7/site-packages/":"${PYTHONPATH}"
+export PYTHONPATH</pre>
+</div>
+</li>
 </ol>
 </div>
 </div>

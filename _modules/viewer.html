@@ -54,10 +54,12 @@
 <span class="c"># -*- coding: utf-8 -*-</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This command line tool can display 16bit TIFF images and shows a smaller zoom window.</span>
+<span class="sd">This command line tool can display 16bit TIFF images.</span>
+<span class="sd">Their contrast is streched and the viewer includes a zoom window.</span>
 
-<span class="sd">It is similar to OpenCV&#39;s example file browse.py:</span>
-<span class="sd">http://code.opencv.org/projects/opencv/repository/entry/trunk/opencv/samples/python2/browse.py .</span>
+<span class="sd">It is similar to OpenCV&#39;s example file browse.py_ .</span>
+
+<span class="sd">.. _browse.py: http://code.opencv.org/projects/opencv/repository/entry/trunk/opencv/samples/python2/browse.py</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
@@ -68,7 +70,7 @@
 <span class="kn">from</span> <span class="nn">tiff</span> <span class="kn">import</span> <span class="n">TIFF</span>
 
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../command-line.html#viewer.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot; Open the image given as first parameter to the command line call. &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot; Displayes the image file given as first parameter on the command line. &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">fn</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">print</span> <span class="s">&#39;loading </span><span class="si">%s</span><span class="s"> ...&#39;</span> <span class="o">%</span> <span class="n">fn</span>

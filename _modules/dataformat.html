@@ -72,7 +72,7 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span><span class="p">,</span> <span class="n">Manager</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span><span class="p">,</span> <span class="n">Manager</span><span class="p">,</span> <span class="n">cpu_count</span>
 <span class="kn">from</span> <span class="nn">blobs</span> <span class="kn">import</span> <span class="n">find_blobs</span>
 <span class="kn">from</span> <span class="nn">tiff</span> <span class="kn">import</span> <span class="n">TIFF</span>
 <span class="kn">from</span> <span class="nn">progress</span> <span class="kn">import</span> <span class="n">ProgressMeter</span>
@@ -83,7 +83,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class can hold a complete measurement taken with the HHG spectrometer.</span>
 
-<span class="sd">    It holds a list of the individual :class:`dataformat.MeasurementPoint` instances.</span>
+<span class="sd">    It holds a list of the individual :class:`MeasurementPoint` instances.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">avg_folder_match</span> <span class="o">=</span> <span class="s">r&#39;avg_(\d)&#39;</span>
     <span class="n">timestamp_match</span> <span class="o">=</span> <span class="s">r&#39;(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})f(\d{2})&#39;</span>
@@ -134,22 +134,22 @@
 
         <span class="c">## Parallel processing of the files</span>
         <span class="n">finished</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="n">num_processes</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">num_processes</span> <span class="o">=</span> <span class="n">cpu_count</span><span class="p">()</span>
         <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="n">num_processes</span><span class="p">)</span>
         <span class="n">manager</span> <span class="o">=</span> <span class="n">Manager</span><span class="p">()</span>
         <span class="n">queue</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">map_async</span><span class="p">(</span><span class="n">process_MeasurementPoint_Wrapper</span><span class="p">,</span> <span class="p">[(</span><span class="n">xmlfile</span><span class="p">,</span> <span class="n">queue</span><span class="p">)</span> <span class="k">for</span> <span class="n">xmlfile</span> <span class="ow">in</span> <span class="n">xmlfiles</span><span class="p">])</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">map_async</span><span class="p">(</span><span class="n">process_MeasurementPoint_QueueWrapper</span><span class="p">,</span> <span class="p">[(</span><span class="n">xmlfile</span><span class="p">,</span> <span class="n">queue</span><span class="p">)</span> <span class="k">for</span> <span class="n">xmlfile</span> <span class="ow">in</span> <span class="n">xmlfiles</span><span class="p">])</span>
         <span class="k">while</span> <span class="ow">not</span> <span class="n">finished</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">queue</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
                 <span class="c">#print(&quot;Processed XML file %s.&quot; % queue.get())</span>
                 <span class="n">queue</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
                 <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">total</span><span class="p">:</span> <span class="n">finished</span> <span class="o">=</span> <span class="bp">True</span>
-                <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="n">num_processes</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">pm</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="n">num_processes</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">pm</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">num_processes</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.02</span><span class="p">)</span>
-        <span class="n">pm</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="n">num_processes</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span> <span class="n">pm</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="n">num_processes</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">measurementPoints</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
         <span class="c">## Sequential processing of the files</span>
         <span class="c">#self.measurementPoints = []</span>
@@ -222,7 +222,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">xml</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
         <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 <div class="viewcode-block" id="MeasurementPoint.read_image"><a class="viewcode-back" href="../classes.html#dataformat.MeasurementPoint.read_image">[docs]</a>    <span class="k">def</span> <span class="nf">read_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imgfile</span><span class="p">,</span> <span class="n">bgfile</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; imgfile and bgfile should be (&#39;/path/to/folder&#39;,&#39;filename.xml&#39;) &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; imgfile and bgfile should be (&#39;/path/to/folder&#39;,&#39;filename.tif&#39;) &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">imgfile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bgfile</span> <span class="o">=</span> <span class="n">imgfile</span><span class="p">,</span> <span class="n">bgfile</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">img</span> <span class="o">=</span> <span class="n">TIFF</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">imgfile</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">bgfile</span><span class="p">:</span>
@@ -250,7 +250,10 @@
         <span class="k">return</span> <span class="s">&quot;MeasurementPoint: (date: </span><span class="si">%s</span><span class="s">, xml: </span><span class="si">%s</span><span class="s">, image: </span><span class="si">%s</span><span class="s">, bgimage: </span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xmlfile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">imgfile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bgfile</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MeasurementPoint.dump_xml_structure"><a class="viewcode-back" href="../classes.html#dataformat.MeasurementPoint.dump_xml_structure">[docs]</a>    <span class="k">def</span> <span class="nf">dump_xml_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Returns a human readable dump of the xml structure. Implemented as a recursive function. &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Returns a human readable dump of the xml structure.</span>
+
+<span class="sd">        Implemented as a recursive function.</span>
+<span class="sd">        Therefore call without providing the `level` argument.&quot;&quot;&quot;</span>
         <span class="n">output</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
         <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="p">:</span>
             <span class="n">output</span> <span class="o">+=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;--&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">level</span><span class="p">)])</span>

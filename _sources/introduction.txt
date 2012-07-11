@@ -56,8 +56,12 @@ Installation of the Requirements
 On a Mac:
 
 1. Install Homebrew_
-2. Install OpenCV like this: ``brew install opencv``
-3. Install Numpy: ``pip install numpy``
+2. Install Numpy: ``pip install numpy``
+3. Install OpenCV like this: ``brew install opencv``
+4. Add these lines to your ``~/.bashrc`` to let Python find it::
 
+    # needed for OpenCV:
+    PYTHONPATH="/usr/local/lib/python2.7/site-packages/":"${PYTHONPATH}"
+    export PYTHONPATH
 
 .. _Homebrew: http://mxcl.github.com/homebrew/

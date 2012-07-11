@@ -57,7 +57,9 @@
 
 <span class="kn">from</span> <span class="nn">dataformat</span> <span class="kn">import</span> <span class="n">Measurement</span>
 <span class="kn">import</span> <span class="nn">keycode</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 
+<span class="c"># A dictionary that defines how many measurement points the tool should jump on keystrokes.</span>
 <span class="n">jump_by</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">keycode</span><span class="o">.</span><span class="n">KEY_RIGHT</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">keycode</span><span class="o">.</span><span class="n">KEY_DOWN</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
@@ -65,11 +67,9 @@
         <span class="n">keycode</span><span class="o">.</span><span class="n">KEY_LEFT</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">keycode</span><span class="o">.</span><span class="n">KEY_UP</span><span class="p">:</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span>
         <span class="p">}</span>
-<span class="sd">&quot;&quot;&quot; A dictionary that defines how many measurement points the tool should jump on keystrokes. &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../command-line.html#walk_folder.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot; The main code, instantiating the class :class:`Measurement` with the folder of the first argument given. &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="sd">&quot;&quot;&quot; The main code, instantiating the class :class:`dataformat.Measurement` with the folder of the first argument given. &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
         <span class="k">print</span> <span class="s">&quot;Give a folder!&quot;</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
