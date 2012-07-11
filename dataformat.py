@@ -20,7 +20,7 @@ import cv2
 import re
 import os
 from datetime import datetime
-from multiprocessing import Pool, Manager
+from multiprocessing import Pool, Manager, cpu_count
 from blobs import find_blobs
 from tiff import TIFF
 from progress import ProgressMeter
@@ -82,7 +82,7 @@ class Measurement(object):
 
         ## Parallel processing of the files
         finished = False
-        num_processes = 4
+        num_processes = cpu_count()
         i = 0
         p = Pool(processes=num_processes)
         manager = Manager()
@@ -94,10 +94,10 @@ class Measurement(object):
                 queue.get()
                 i += 1
                 if i == total: finished = True
-                if i % num_processes == 0: pm.update(4)
+                if i % num_processes == 0: pm.update(num_processes)
             else:
                 time.sleep(0.02)
-        pm.update(4)
+        if i % num_processes != 0: pm.update(i % num_processes)
         self.measurementPoints = result.get()
         ## Sequential processing of the files
         #self.measurementPoints = []
