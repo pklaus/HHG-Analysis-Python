@@ -1,3 +1,4 @@
-*.tif
+HHG*.tif
+HHG*.png
 *.xml
 *.pyc
