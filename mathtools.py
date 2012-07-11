@@ -1,7 +1,16 @@
+# -*- coding: utf-8 -*-
+
+""" A collection of useful mathematical tools and functions. """
+
 import numpy as np
 
 def scoreatpercentile(a, per, limit=()):
-    """ http://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.scoreatpercentile.html """
+    """
+    Calculate the score at the given percentile_ `per` of the sequence `a`.
+
+    Largely the same as http://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.scoreatpercentile.html .
+
+    .. _percentile: http://en.wikipedia.org/wiki/Percentile"""
     values = np.sort(a, axis=0)
     if limit:
         values = values[(limit[0] <= values) & (values <= limit[1])]

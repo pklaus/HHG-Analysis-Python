@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """
 http://code.activestate.com/recipes/473899-progress-meter/
 2006-02-20 Denis Barmenkov: ANSI codes replaced by Backspace (0x08) characters
@@ -8,6 +10,7 @@ also nice: http://code.google.com/p/python-progressbar/
 import time, sys, math
 
 class ProgressMeter(object):
+    """ A progress bar in the standard output. """
     #ESC = chr(27)
     def __init__(self, **kw):
         # What time do we start tracking our progress from?
@@ -34,6 +37,11 @@ class ProgressMeter(object):
         self.prev_meter_len = 0
 
     def update(self, count, **kw):
+        """
+        Call this function whenever there is some progress to be reported.
+        The output will only be refreshed if the time since the last call
+        is long enough.
+        """
         now = time.time()
         # Caclulate rate of progress
         rate = 0.0
@@ -89,6 +97,7 @@ class ProgressMeter(object):
         return '[%s>%s] %d%%  (%d of %d)   cur: %.1f/sec   avg: %.1f/sec' % (bar, pad, perc, cnt, tot, cur, avg)
 
     def refresh(self, **kw):
+        """ Refreshing the output to the standard output. """
         # Clear line and return cursor to start-of-line
         sys.stdout.write(' ' * self.prev_meter_len + '\x08' * self.prev_meter_len)
         # Get meter text
@@ -106,6 +115,7 @@ class ProgressMeter(object):
 
 
 if __name__ == '__main__':
+    """ Example showing how this code can be used."""
     import time
     import random
 

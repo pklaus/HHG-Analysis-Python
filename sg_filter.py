@@ -1,20 +1,26 @@
+# -*- coding: utf-8 -*-
+
+"""
+A module that implements the useful Savitzky–Golay filter.
+See http://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_smoothing_filter .
+"""
+
 from math import *
 from numpy import *
 
 def calc_coeff(num_points, pol_degree, diff_order=0):
-    """ calculates filter coefficients for symmetric savitzky-golay filter.
-        see: http://www.nrbook.com/a/bookcpdf/c14-8.pdf
+    """ Calculates filter coefficients for symmetric Savitzky–Golay filter.
+    see: http://www.nrbook.com/a/bookcpdf/c14-8.pdf
 
-        num_points   means that 2*num_points+1 values contribute to the
-                     smoother.
-
-        pol_degree   is degree of fitting polynomial
-
-        diff_order   is degree of implicit differentiation.
-                     0 means that filter results in smoothing of function
-                     1 means that filter results in smoothing the first
-                                                 derivative of function.
-                     and so on ...
+    :param num_points: means that 2*num_points+1 values contribute to the smoother.
+    :type num_points: int.
+    :param pol_degree: is degree of fitting polynomial
+    :type pol_degree: int.
+    :param diff_order: is degree of implicit differentiation.
+      0 means that filter results in smoothing of function.
+      1 means that filter results in smoothing the first derivative of function.
+    :type diff_order: int.
+    :returns:  numpy.array -- The coefficients for the Savitzky–Golay filter.
     """
 
     # Setup interpolation matrix. You might use other interpolation
@@ -40,7 +46,7 @@ def calc_coeff(num_points, pol_degree, diff_order=0):
     return coeff
 
 def smooth(signal, coeff):
-    """ applies coefficients calculated by calc_coeff() to signal """
+    """ Applies coefficients calculated by :py:func:`calc_coeff` to signal. """
     N = (size(coeff)-1)/2
     res = convolve(signal, coeff)
     return res[N:-N]

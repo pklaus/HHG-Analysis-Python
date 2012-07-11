@@ -1,4 +1,18 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+
+This module holds classes and helper functions to represent the data format
+of the measurements carried out with the HHG spectrometer.
+
+It helps reading in the data from the folders and extracts information from the
+implicit data structure found in the sets of
+
+- XML
+- and TIFF files.
+
+"""
 
 from xml.etree.ElementTree import parse
 from numpy import array
@@ -14,6 +28,11 @@ import time
 
 
 class Measurement(object):
+    """
+    This class can hold a complete measurement taken with the HHG spectrometer.
+
+    It holds a list of the individual :class:`MeasurementPoint` instances.
+    """
     avg_folder_match = r'avg_(\d)'
     timestamp_match = r'(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})f(\d{2})'
     image_match = r'HHG_' + timestamp_match + '_\.tif'
@@ -29,6 +48,15 @@ class Measurement(object):
         return xml_filename.replace('.xml','.tif'), xml_filename.replace('.xml','bg.tif')
 
     def read_measurement(self, folder):
+        """
+        This function contains the logic to read in measurement folders.
+        First, it finds out what it has to do and creates a list of instructions.
+        Then it starts to process those jobs in parallel.
+
+        :param folder: The path to the folder that contains the measurment.
+        :type folder: str.
+
+        """
         avg_folders = []
         for filename in os.listdir(folder):
             if re.match(self.avg_folder_match, filename):
@@ -80,9 +108,10 @@ class Measurement(object):
         self.after_process()
 
     def after_process(self):
-        """Calculate overall properties
+        """Calculate properties derived from all the measurement points.
+
         If they are expensive to calculate, their calculation should be prepared in
-        the creation process of the process_MeasurementPoint() call.
+        the instantiation process of the :class:`MeasurementPoint` class.
         """
         print "Starting after-processing."
         self.minmax = ( min([mp.minmax[0] for mp in self.measurementPoints]),
@@ -91,7 +120,12 @@ class Measurement(object):
         for mp in self.measurementPoints:
             mp.collection = self
 
-def process_MeasurementPoint_Wrapper(args):
+def process_MeasurementPoint_QueueWrapper(args):
+    """
+    This function wraps calls to :func:`process_MeasurementPoint`
+    and tells a queue when it's share is done.
+    It is made to be used as callback for the :py:module:`multiprocessing` module if you want parallel processing.
+    """
     instructions = args[0]
     queue = args[1]
     retval = process_MeasurementPoint(instructions)
@@ -99,6 +133,11 @@ def process_MeasurementPoint_Wrapper(args):
     return retval
 
 def process_MeasurementPoint(instructions):
+    """
+    This is a function that can be called for every MeasurementPoint
+    to be be processed according to the 'instructions'.
+    This leverages the parallel processing of those measurement points.
+    """
     image_file, bg_file = Measurement.other_files_for_xml(instructions['f'])
     return MeasurementPoint(
         instructions['date'],
@@ -109,6 +148,11 @@ def process_MeasurementPoint(instructions):
         )
 
 class MeasurementPoint(object):
+    """
+    This class holds all data associated with a single measurement point.
+    This includes an XML file, the image from the spectrometer and a
+    background reference image.
+    """
     PD_SCOPE_CHANNEL = 0
     ION_SCOPE_CHANNEL = 1
     collection = None
@@ -126,7 +170,7 @@ class MeasurementPoint(object):
         self.xml = tree.getroot()
         f.close()
     def read_image(self, imgfile, bgfile=None):
-        """ imgfile and bgfile should be ('/path/to/folder','filename.xml') """
+        """ imgfile and bgfile should be ('/path/to/folder','filename.tif') """
         self.imgfile, self.bgfile = imgfile, bgfile
         self.img = TIFF(os.path.join(imgfile))
         if bgfile:
@@ -135,6 +179,7 @@ class MeasurementPoint(object):
         self.percentiles = self.img.percentiles([1,5,99,99.995])
         self.blobs = find_blobs(self.img.data)
     def display_image(self, rescale=False, rescale_to_global_minmax=False, rescale_to_percentile_and_max=False):
+        """ Displayes the spectrometer image using OpenCV's function :py:func:`cv2.imshow` """
         if rescale:
             i = self.img
             if rescale_to_global_minmax:
@@ -153,6 +198,10 @@ class MeasurementPoint(object):
         return "MeasurementPoint: (date: %s, xml: %s, image: %s, bgimage: %s)" % (self.date, self.xmlfile, self.imgfile, self.bgfile)
 
     def dump_xml_structure(self, level=0):
+        """ Returns a human readable dump of the xml structure.
+
+        Implemented as a recursive function.
+        Therefore call without providing the `level` argument."""
         output = ''
         for element in self.xml:
             output += ''.join(['--' for i in range(level)])

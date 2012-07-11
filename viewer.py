@@ -1,24 +1,32 @@
 #!/usr/bin/env python
-''' browse.py - Sample shows how to implement a simple hi resolution image navigation '''
+# -*- coding: utf-8 -*-
+
+"""
+This command line tool can display 16bit TIFF images.
+Their contrast is streched and the viewer includes a zoom window.
+
+It is similar to OpenCV's example file browse.py_ .
+
+.. _browse.py: http://code.opencv.org/projects/opencv/repository/entry/trunk/opencv/samples/python2/browse.py
+"""
 
 import numpy as np
 import cv2
 import sys
-
+import Tkinter # for Tkinter.Tk().winfo_screenwidth()
 from geometry import coordinates, rectangle
 from tiff import TIFF
 
-import Tkinter # for Tkinter.Tk().winfo_screenwidth()
-
-if __name__ == '__main__':
+def main():
+    """ Displayes the image file given as first parameter on the command line. """
     if len(sys.argv) > 1:
         fn = sys.argv[1]
         print 'loading %s ...' % fn
         img = TIFF(fn)
         bit = img.depth
     else:
-        print 'This sample shows how to implement a simple hi resolution image navigation.'
-        print 'USAGE: browse.py [image filename]\n'
+        print __doc__
+        print 'USAGE: %s [image filename]\n' % sys.argv[0]
 
         sz = 4096
         bit = 8
@@ -70,3 +78,6 @@ if __name__ == '__main__':
     show_zoom(0,0)
     cv2.setMouseCallback('Overview', onmouse)
     cv2.waitKey()
+
+if __name__ == '__main__':
+    main()

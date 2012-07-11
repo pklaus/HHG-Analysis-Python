@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# HHG Analysis documentation build configuration file, created by
+# HHG-Analysis-Python documentation build configuration file, created by
 # sphinx-quickstart on Wed Jul 11 10:37:57 2012.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -41,7 +41,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'HHG Analysis'
+project = u'HHG-Analysis-Python'
 copyright = u'2012, Philipp Klaus'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -185,7 +185,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'HHGAnalysis.tex', u'HHG Analysis Documentation',
+  ('index', 'HHG-Analysis-Python.tex', u'HHG-Analysis-Python Documentation',
    u'Philipp Klaus', 'manual'),
 ]
 
@@ -215,7 +215,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'hhganalysis', u'HHG Analysis Documentation',
+    ('index', 'hhganalysis', u'HHG-Analysis-Python Documentation',
      [u'Philipp Klaus'], 1)
 ]
 
@@ -229,8 +229,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'HHGAnalysis', u'HHG Analysis Documentation',
-   u'Philipp Klaus', 'HHGAnalysis', 'One line description of project.',
+  ('index', 'HHGAnalysis', u'HHG-Analysis-Python Documentation',
+   u'Philipp Klaus', 'HHGAnalysis', 'Analysis toolkit for measurements carried out with the XUV spectrometer.',
    'Miscellaneous'),
 ]
 
@@ -247,7 +247,7 @@ texinfo_documents = [
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = u'HHG Analysis'
+epub_title = u'HHG-Analysis-Python'
 epub_author = u'Philipp Klaus'
 epub_publisher = u'Philipp Klaus'
 epub_copyright = u'2012, Philipp Klaus'

@@ -1,8 +1,12 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+""" Command line tool to read measurement folders and navigate through their measurement points. """
 
 from dataformat import Measurement
 import keycode
 
+# A dictionary that defines how many measurement points the tool should jump on keystrokes.
 jump_by = {
         keycode.KEY_RIGHT: 1,
         keycode.KEY_DOWN: 10,
@@ -11,7 +15,8 @@ jump_by = {
         keycode.KEY_UP: -10,
         }
 
-if __name__ == '__main__':
+def main():
+    """ The main code, instantiating the class :class:`dataformat.Measurement` with the folder of the first argument given. """
     import sys
     if len(sys.argv) < 2:
         print "Give a folder!"
@@ -34,3 +39,6 @@ if __name__ == '__main__':
         if key in jump_by.keys():
             i += jump_by[key]
     print("Last image displayed, exiting.")
+
+if __name__ == '__main__':
+    main()

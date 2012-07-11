@@ -1,4 +1,10 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+This module can find overflow areas in images (“blobs”).
+It makes heavy use of OpenCV.
+"""
 
 # http://code.opencv.org/svn/opencv/trunk/opencv/samples/python2/contours.py
 # http://code.opencv.org/svn/opencv/trunk/opencv/samples/python2/squares.py
@@ -10,7 +16,11 @@ import cv2.cv as cv
 from tiff import TIFF
 
 def find_blobs(img_data, verbose=False, min_area=None):
-    """ Find second level contours in 16bit images """
+    """ Find second level contours in 16bit images
+
+    Here is an example to illustrate the contours of the blob this function can find:
+
+    .. image:: _static/blobs-contours.png"""
     blobs = []
     copy_data = img_data.copy()
     if img_data.dtype == 'uint16':
@@ -42,6 +52,12 @@ def find_blobs(img_data, verbose=False, min_area=None):
     return blobs
 
 def fix_image(img, blobs):
+    """
+    This function can fix images where blobs have been found using :py:func:`find_blobs`.
+
+    Here is an example of what this does:
+
+    .. image:: _static/blob-fix.png"""
     ## blobs_img holds 0 for good pixels and 1 for pixels where an overflow occured
     blobs_img = np.zeros(img.dimensions, img.data.dtype)
     cv2.drawContours( blobs_img, blobs, -1, 1, -1) # fill contour
@@ -52,7 +68,12 @@ def fix_image(img, blobs):
     return ((img.data-cropped_blobs)*.5 + blobs_img*img.data*.5+blobs_img*2**(img.depth-1)).astype(img.data.dtype)
 
 
-if __name__ == '__main__':
+def main():
+    """ This function is a demonstration of how this module is being used.
+    It is implemented as a command line tool. Run this module file to see how it works.
+
+    It can serve for unit tests too.
+    """
     import sys
     if len(sys.argv) > 1:
         img_files = sys.argv[1:]
@@ -91,3 +112,6 @@ if __name__ == '__main__':
             break
 
     cv2.destroyAllWindows()
+
+if __name__ == '__main__':
+    main()
