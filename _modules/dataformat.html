@@ -1,0 +1,292 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>dataformat &mdash; HHG Analysis 0.8 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.8',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="HHG Analysis 0.8 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">HHG Analysis 0.8 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for dataformat</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+
+<span class="kn">from</span> <span class="nn">xml.etree.ElementTree</span> <span class="kn">import</span> <span class="n">parse</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">array</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span><span class="p">,</span> <span class="n">Manager</span>
+<span class="kn">from</span> <span class="nn">blobs</span> <span class="kn">import</span> <span class="n">find_blobs</span>
+<span class="kn">from</span> <span class="nn">tiff</span> <span class="kn">import</span> <span class="n">TIFF</span>
+<span class="kn">from</span> <span class="nn">progress</span> <span class="kn">import</span> <span class="n">ProgressMeter</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+
+<div class="viewcode-block" id="Measurement"><a class="viewcode-back" href="../dataformat.html#dataformat.Measurement">[docs]</a><span class="k">class</span> <span class="nc">Measurement</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">avg_folder_match</span> <span class="o">=</span> <span class="s">r&#39;avg_(\d)&#39;</span>
+    <span class="n">timestamp_match</span> <span class="o">=</span> <span class="s">r&#39;(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})f(\d{2})&#39;</span>
+    <span class="n">image_match</span> <span class="o">=</span> <span class="s">r&#39;HHG_&#39;</span> <span class="o">+</span> <span class="n">timestamp_match</span> <span class="o">+</span> <span class="s">&#39;_\.tif&#39;</span>
+    <span class="n">bg_image_match</span> <span class="o">=</span> <span class="s">r&#39;HHG_&#39;</span> <span class="o">+</span> <span class="n">timestamp_match</span> <span class="o">+</span> <span class="s">&#39;_bg\.tif&#39;</span>
+    <span class="n">xml_match</span> <span class="o">=</span> <span class="s">r&#39;HHG_&#39;</span> <span class="o">+</span> <span class="n">timestamp_match</span> <span class="o">+</span> <span class="s">&#39;_\.xml&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_measurement</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Measurement.other_files_for_xml"><a class="viewcode-back" href="../dataformat.html#dataformat.Measurement.other_files_for_xml">[docs]</a>    <span class="k">def</span> <span class="nf">other_files_for_xml</span><span class="p">(</span><span class="n">xml_filename</span><span class="p">):</span>
+        <span class="s">&quot;Returns the names of the image and background files that belong to a certain xml file.&quot;</span>
+        <span class="k">return</span> <span class="n">xml_filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;.xml&#39;</span><span class="p">,</span><span class="s">&#39;.tif&#39;</span><span class="p">),</span> <span class="n">xml_filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;.xml&#39;</span><span class="p">,</span><span class="s">&#39;bg.tif&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Measurement.read_measurement"><a class="viewcode-back" href="../dataformat.html#dataformat.Measurement.read_measurement">[docs]</a>    <span class="k">def</span> <span class="nf">read_measurement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param folder: The path to the folder that contains the measurment.</span>
+<span class="sd">        :type path: str.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">avg_folders</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">avg_folder_match</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+                <span class="n">avg_folders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">xmlfiles</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">avg_folder</span> <span class="ow">in</span> <span class="n">avg_folders</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">dirnames</span><span class="p">,</span> <span class="n">filenames</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span><span class="n">avg_folder</span><span class="p">)):</span>
+                <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">:</span>
+                    <span class="n">xmlmatch</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xml_match</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">xmlmatch</span><span class="p">:</span>
+                        <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">xmlmatch</span><span class="o">.</span><span class="n">groups</span><span class="p">()]</span>
+                        <span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">vals</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">vals</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">vals</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span><span class="n">vals</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span><span class="n">vals</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span><span class="n">vals</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">*</span><span class="mi">10000</span><span class="p">)</span>
+                        <span class="n">image_file</span><span class="p">,</span> <span class="n">bg_file</span> <span class="o">=</span> <span class="n">Measurement</span><span class="o">.</span><span class="n">other_files_for_xml</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">image_file</span><span class="p">)):</span>
+                            <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="s">&#39;No TIFF image found for XML </span><span class="si">%s</span><span class="s">.&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">bg_file</span><span class="p">)):</span>
+                            <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="s">&#39;No background TIFF image found for XML </span><span class="si">%s</span><span class="s">.&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+                        <span class="n">xmlfiles</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;date&#39;</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">:</span> <span class="n">dirname</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">:</span> <span class="n">filename</span><span class="p">,</span> <span class="s">&#39;avg&#39;</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">avg_folder_match</span><span class="p">,</span> <span class="n">avg_folder</span><span class="p">)</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">]})</span>
+        <span class="k">if</span> <span class="n">xmlfiles</span> <span class="o">==</span> <span class="p">[]:</span>
+            <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="s">&quot;This folder doesn&#39;t seem to contain measurement data&quot;</span><span class="p">)</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">xmlfiles</span><span class="p">)</span>
+        <span class="n">pm</span> <span class="o">=</span> <span class="n">ProgressMeter</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">total</span><span class="p">)</span>
+
+        <span class="c">## Parallel processing of the files</span>
+        <span class="n">finished</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">num_processes</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="n">num_processes</span><span class="p">)</span>
+        <span class="n">manager</span> <span class="o">=</span> <span class="n">Manager</span><span class="p">()</span>
+        <span class="n">queue</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">map_async</span><span class="p">(</span><span class="n">process_MeasurementPoint_Wrapper</span><span class="p">,</span> <span class="p">[(</span><span class="n">xmlfile</span><span class="p">,</span> <span class="n">queue</span><span class="p">)</span> <span class="k">for</span> <span class="n">xmlfile</span> <span class="ow">in</span> <span class="n">xmlfiles</span><span class="p">])</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">finished</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">queue</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
+                <span class="c">#print(&quot;Processed XML file %s.&quot; % queue.get())</span>
+                <span class="n">queue</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">total</span><span class="p">:</span> <span class="n">finished</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="n">num_processes</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">pm</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.02</span><span class="p">)</span>
+        <span class="n">pm</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">measurementPoints</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="c">## Sequential processing of the files</span>
+        <span class="c">#self.measurementPoints = []</span>
+        <span class="c">#for xmlfile in xmlfiles:</span>
+        <span class="c">#    self.measurementPoints.append(process_MeasurementPoint(xmlfile))</span>
+        <span class="c">#    pm.update(1)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">after_process</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="Measurement.after_process"><a class="viewcode-back" href="../dataformat.html#dataformat.Measurement.after_process">[docs]</a>    <span class="k">def</span> <span class="nf">after_process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate overall properties</span>
+<span class="sd">        If they are expensive to calculate, their calculation should be prepared in</span>
+<span class="sd">        the creation process of the process_MeasurementPoint() call.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">print</span> <span class="s">&quot;Starting after-processing.&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minmax</span> <span class="o">=</span> <span class="p">(</span> <span class="nb">min</span><span class="p">([</span><span class="n">mp</span><span class="o">.</span><span class="n">minmax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">mp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurementPoints</span><span class="p">]),</span>
+                        <span class="nb">max</span><span class="p">([</span><span class="n">mp</span><span class="o">.</span><span class="n">minmax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">mp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurementPoints</span><span class="p">])</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blobs_found</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">mp</span><span class="o">.</span><span class="n">blobs</span><span class="p">)</span> <span class="k">for</span> <span class="n">mp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurementPoints</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">mp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurementPoints</span><span class="p">:</span>
+            <span class="n">mp</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span>
+</div></div>
+<div class="viewcode-block" id="process_MeasurementPoint_Wrapper"><a class="viewcode-back" href="../dataformat.html#dataformat.process_MeasurementPoint_Wrapper">[docs]</a><span class="k">def</span> <span class="nf">process_MeasurementPoint_Wrapper</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">instructions</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">queue</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">retval</span> <span class="o">=</span> <span class="n">process_MeasurementPoint</span><span class="p">(</span><span class="n">instructions</span><span class="p">)</span>
+    <span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">instructions</span><span class="p">[</span><span class="s">&#39;f&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">retval</span>
+</div>
+<div class="viewcode-block" id="process_MeasurementPoint"><a class="viewcode-back" href="../dataformat.html#dataformat.process_MeasurementPoint">[docs]</a><span class="k">def</span> <span class="nf">process_MeasurementPoint</span><span class="p">(</span><span class="n">instructions</span><span class="p">):</span>
+    <span class="n">image_file</span><span class="p">,</span> <span class="n">bg_file</span> <span class="o">=</span> <span class="n">Measurement</span><span class="o">.</span><span class="n">other_files_for_xml</span><span class="p">(</span><span class="n">instructions</span><span class="p">[</span><span class="s">&#39;f&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">MeasurementPoint</span><span class="p">(</span>
+        <span class="n">instructions</span><span class="p">[</span><span class="s">&#39;date&#39;</span><span class="p">],</span>
+        <span class="n">instructions</span><span class="p">[</span><span class="s">&#39;avg&#39;</span><span class="p">],</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">instructions</span><span class="p">[</span><span class="s">&#39;d&#39;</span><span class="p">],</span> <span class="n">instructions</span><span class="p">[</span><span class="s">&#39;f&#39;</span><span class="p">]),</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">instructions</span><span class="p">[</span><span class="s">&#39;d&#39;</span><span class="p">],</span> <span class="n">image_file</span><span class="p">),</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">instructions</span><span class="p">[</span><span class="s">&#39;d&#39;</span><span class="p">],</span> <span class="n">bg_file</span><span class="p">),</span>
+        <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="MeasurementPoint"><a class="viewcode-back" href="../dataformat.html#dataformat.MeasurementPoint">[docs]</a><span class="k">class</span> <span class="nc">MeasurementPoint</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">PD_SCOPE_CHANNEL</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">ION_SCOPE_CHANNEL</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">collection</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">avgnum</span><span class="p">,</span> <span class="n">xmlfile</span><span class="p">,</span> <span class="n">imgfile</span><span class="p">,</span> <span class="n">bgfile</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="c">#print(&quot;Reading XML file %s&quot; % xmlfile)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">date</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">avgnum</span> <span class="o">=</span> <span class="n">avgnum</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_xml</span><span class="p">(</span><span class="n">xmlfile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_image</span><span class="p">(</span><span class="n">imgfile</span><span class="p">,</span><span class="n">bgfile</span><span class="p">)</span>
+<div class="viewcode-block" id="MeasurementPoint.read_xml"><a class="viewcode-back" href="../dataformat.html#dataformat.MeasurementPoint.read_xml">[docs]</a>    <span class="k">def</span> <span class="nf">read_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xmlfile</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; xmlfile should be (&#39;/path/to/folder&#39;,&#39;filename.xml&#39;) &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xmlfile</span> <span class="o">=</span> <span class="n">xmlfile</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">xmlfile</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">)</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xml</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+<div class="viewcode-block" id="MeasurementPoint.read_image"><a class="viewcode-back" href="../dataformat.html#dataformat.MeasurementPoint.read_image">[docs]</a>    <span class="k">def</span> <span class="nf">read_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imgfile</span><span class="p">,</span> <span class="n">bgfile</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; imgfile and bgfile should be (&#39;/path/to/folder&#39;,&#39;filename.xml&#39;) &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imgfile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bgfile</span> <span class="o">=</span> <span class="n">imgfile</span><span class="p">,</span> <span class="n">bgfile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img</span> <span class="o">=</span> <span class="n">TIFF</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">imgfile</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">bgfile</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">data</span> <span class="o">-=</span> <span class="n">TIFF</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bgfile</span><span class="p">))</span><span class="o">.</span><span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">minmax</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">percentiles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">percentiles</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">99</span><span class="p">,</span><span class="mf">99.995</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blobs</span> <span class="o">=</span> <span class="n">find_blobs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div>
+<div class="viewcode-block" id="MeasurementPoint.display_image"><a class="viewcode-back" href="../dataformat.html#dataformat.MeasurementPoint.display_image">[docs]</a>    <span class="k">def</span> <span class="nf">display_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rescale</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">rescale_to_global_minmax</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">rescale_to_percentile_and_max</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">rescale</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span>
+            <span class="k">if</span> <span class="n">rescale_to_global_minmax</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;Rescaling to global min and max values (</span><span class="si">%d</span><span class="s">,</span><span class="si">%d</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">minmax</span><span class="p">)</span>
+                <span class="n">img_data</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">rescale</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">minmax</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">rescale_to_percentile_and_max</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;Rescaling image using 5 percent percentile to local maximum value: (</span><span class="si">%d</span><span class="s">,</span><span class="si">%d</span><span class="s">).&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">percentiles</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">i</span><span class="o">.</span><span class="n">minmax</span><span class="p">()[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="n">img_data</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">rescale</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">percentiles</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">i</span><span class="o">.</span><span class="n">minmax</span><span class="p">()[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">img_data</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">rescale</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">minmax</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">img_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s">&#39;test&#39;</span><span class="p">,</span><span class="n">img_data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">()</span></div>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;MeasurementPoint: (date: </span><span class="si">%s</span><span class="s">, xml: </span><span class="si">%s</span><span class="s">, image: </span><span class="si">%s</span><span class="s">, bgimage: </span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xmlfile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">imgfile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bgfile</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MeasurementPoint.dump_xml_structure"><a class="viewcode-back" href="../dataformat.html#dataformat.MeasurementPoint.dump_xml_structure">[docs]</a>    <span class="k">def</span> <span class="nf">dump_xml_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;--&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">level</span><span class="p">)])</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="s">&quot;&gt; &quot;</span> <span class="o">+</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span>
+            <span class="k">if</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">content</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="s">&quot; &quot;</span><span class="p">)</span>
+                <span class="n">output</span> <span class="o">+=</span> <span class="s">&quot; :  &quot;</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">:</span>
+                    <span class="n">output</span> <span class="o">+=</span> <span class="n">content</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">output</span> <span class="o">+=</span> <span class="n">content</span><span class="p">[:</span><span class="mi">20</span><span class="p">]</span> <span class="o">+</span> <span class="s">&quot; ...&quot;</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dump_xml_structure</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">level</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span>
+</div>
+<div class="viewcode-block" id="MeasurementPoint.get_stage_positions"><a class="viewcode-back" href="../dataformat.html#dataformat.MeasurementPoint.get_stage_positions">[docs]</a>    <span class="k">def</span> <span class="nf">get_stage_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</div>
+<div class="viewcode-block" id="MeasurementPoint.get_photodiode_scope_channel"><a class="viewcode-back" href="../dataformat.html#dataformat.MeasurementPoint.get_photodiode_scope_channel">[docs]</a>    <span class="k">def</span> <span class="nf">get_photodiode_scope_channel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_scope_channel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PD_SCOPE_CHANNEL</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="MeasurementPoint.get_ion_scope_channel"><a class="viewcode-back" href="../dataformat.html#dataformat.MeasurementPoint.get_ion_scope_channel">[docs]</a>    <span class="k">def</span> <span class="nf">get_ion_scope_channel</span><span class="p">(</span><span class="n">run</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_scope_channel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ION_SCOPE_CHANNEL</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="MeasurementPoint.get_scope_channel"><a class="viewcode-back" href="../dataformat.html#dataformat.MeasurementPoint.get_scope_channel">[docs]</a>    <span class="k">def</span> <span class="nf">get_scope_channel</span><span class="p">(</span><span class="n">run</span><span class="p">,</span> <span class="n">channel_no</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">scope</span> <span class="ow">in</span> <span class="n">run</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">scope</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s">&#39;NI_TCP_Scope&#39;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">scope</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">channel</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s">&#39;CH&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">channel_no</span><span class="p">):</span>
+                        <span class="n">data</span> <span class="o">=</span> <span class="n">channel</span><span class="o">.</span><span class="n">text</span>
+                        <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">split</span><span class="p">()]</span>
+                        <span class="k">return</span> <span class="n">data</span></div>
+<div class="viewcode-block" id="MeasurementPoint.calculate_ion_signal"><a class="viewcode-back" href="../dataformat.html#dataformat.MeasurementPoint.calculate_ion_signal">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_ion_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ion_signal_point</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">ion_signal_point</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ion_scope_channel</span><span class="p">():</span>
+            <span class="n">ion_signal</span> <span class="o">+=</span> <span class="n">ion_signal_point</span>
+        <span class="k">return</span> <span class="n">ion_signal</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">HHG Analysis 0.8 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Philipp Klaus.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

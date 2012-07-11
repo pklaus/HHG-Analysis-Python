@@ -1,0 +1,193 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Reading Measurements &mdash; HHG Analysis 0.8 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.8',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="HHG Analysis 0.8 documentation" href="index.html" />
+    <link rel="next" title="The Image Helper Class" href="tiff.html" />
+    <link rel="prev" title="Welcome to HHG Analysis’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tiff.html" title="The Image Helper Class"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to HHG Analysis’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">HHG Analysis 0.8 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-dataformat">
+<span id="reading-measurements"></span><h1>Reading Measurements<a class="headerlink" href="#module-dataformat" title="Permalink to this headline">¶</a></h1>
+<p>This module holds classes and helper functions to represent the data format
+of the measurements carried out with the HHG spectrometer.</p>
+<p>It helps reading in the data from the folders and extracts information from the
+implicit data structure found in the sets of</p>
+<ul class="simple">
+<li>XML</li>
+<li>and TIFF files.</li>
+</ul>
+<div class="section" id="the-class-measurement">
+<h2>The Class Measurement<a class="headerlink" href="#the-class-measurement" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataformat.Measurement">
+<em class="property">class </em><tt class="descclassname">dataformat.</tt><tt class="descname">Measurement</tt><big>(</big><em>folder</em><big>)</big><a class="reference internal" href="_modules/dataformat.html#Measurement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataformat.Measurement" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class can hold a complete measurement taken with the HHG spectrometer.</p>
+<p>It holds a list of the individual <a class="reference internal" href="#dataformat.MeasurementPoint" title="dataformat.MeasurementPoint"><tt class="xref py py-class docutils literal"><span class="pre">dataformat.MeasurementPoint</span></tt></a> instances.</p>
+<dl class="method">
+<dt id="dataformat.Measurement.after_process">
+<tt class="descname">after_process</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/dataformat.html#Measurement.after_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataformat.Measurement.after_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate overall properties
+If they are expensive to calculate, their calculation should be prepared in
+the creation process of the process_MeasurementPoint() call.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="dataformat.Measurement.other_files_for_xml">
+<em class="property">static </em><tt class="descname">other_files_for_xml</tt><big>(</big><em>xml_filename</em><big>)</big><a class="reference internal" href="_modules/dataformat.html#Measurement.other_files_for_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataformat.Measurement.other_files_for_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the names of the image and background files that belong to a certain xml file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataformat.Measurement.read_measurement">
+<tt class="descname">read_measurement</tt><big>(</big><em>folder</em><big>)</big><a class="reference internal" href="_modules/dataformat.html#Measurement.read_measurement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataformat.Measurement.read_measurement" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>folder</strong> &#8211; The path to the folder that contains the measurment.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="the-class-measurementpoint">
+<h2>The Class MeasurementPoint<a class="headerlink" href="#the-class-measurementpoint" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="dataformat.MeasurementPoint">
+<em class="property">class </em><tt class="descclassname">dataformat.</tt><tt class="descname">MeasurementPoint</tt><big>(</big><em>date</em>, <em>avgnum</em>, <em>xmlfile</em>, <em>imgfile</em>, <em>bgfile=None</em><big>)</big><a class="reference internal" href="_modules/dataformat.html#MeasurementPoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataformat.MeasurementPoint" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="dataformat.MeasurementPoint.read_image">
+<tt class="descname">read_image</tt><big>(</big><em>imgfile</em>, <em>bgfile=None</em><big>)</big><a class="reference internal" href="_modules/dataformat.html#MeasurementPoint.read_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataformat.MeasurementPoint.read_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>imgfile and bgfile should be (&#8216;/path/to/folder&#8217;,&#8217;filename.xml&#8217;)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dataformat.MeasurementPoint.read_xml">
+<tt class="descname">read_xml</tt><big>(</big><em>xmlfile</em><big>)</big><a class="reference internal" href="_modules/dataformat.html#MeasurementPoint.read_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataformat.MeasurementPoint.read_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>xmlfile should be (&#8216;/path/to/folder&#8217;,&#8217;filename.xml&#8217;)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Reading Measurements</a><ul>
+<li><a class="reference internal" href="#the-class-measurement">The Class Measurement</a></li>
+<li><a class="reference internal" href="#the-class-measurementpoint">The Class MeasurementPoint</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to HHG Analysis&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tiff.html"
+                        title="next chapter">The Image Helper Class</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/dataformat.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tiff.html" title="The Image Helper Class"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to HHG Analysis’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">HHG Analysis 0.8 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Philipp Klaus.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
