@@ -5,6 +5,7 @@
 
 from dataformat import Measurement
 import keycode
+import sys
 
 # A dictionary that defines how many measurement points the tool should jump on keystrokes.
 jump_by = {
@@ -17,7 +18,6 @@ jump_by = {
 
 def main():
     """ The main code, instantiating the class :class:`dataformat.Measurement` with the folder of the first argument given. """
-    import sys
     if len(sys.argv) < 2:
         print "Give a folder!"
         sys.exit(1)
