@@ -10,6 +10,17 @@ command line (adjust your path to a measurement folder)::
 This will load the files in that folder and will let you walk you through the
 measurement points using the arrow keys.
 
+Here is an example video that illustrates the usage of these tools:
+
+.. raw:: html
+
+   <video width="640" height="360" controls="controls">
+     <source src="_static/screencast_walk-folder_w-subtitles.mp4" type="video/mp4" />
+     <source src="_static/screencast_walk-folder_w-subtitles.ogv" type="video/ogg" />
+     Your browser does not support the video tag.
+   </video>
+
+
 
 Requirements
 ------------
