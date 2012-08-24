@@ -7,15 +7,6 @@ from dataformat import Measurement
 import keycode
 import sys
 
-# A dictionary that defines how many measurement points the tool should jump on keystrokes.
-jump_by = {
-        keycode.KEY_RIGHT: 1,
-        keycode.KEY_DOWN: 10,
-        keycode.KEY_SPACE: 1,
-        keycode.KEY_LEFT: -1,
-        keycode.KEY_UP: -10,
-        }
-
 def main():
     """ The main code, instantiating the class :class:`dataformat.Measurement` with the folder of the first argument given. """
     if len(sys.argv) < 2:
@@ -34,10 +25,17 @@ def main():
     while i in range(len(m.measurementPoints)):
         print("Showing image %d of %d." % (i+1, len(m.measurementPoints)) )
         key = m.measurementPoints[i].display_image(rescale=True,rescale_to_percentile_and_max=True)
-        if key == keycode.KEY_ESCAPE: # 27
+        # how many measurement points should the tool jump on keystrokes
+        if key in keycode.KEY_ESCAPE or key in keycode.KEY_CLOSE_WINDOW:
             break
-        if key in jump_by.keys():
-            i += jump_by[key]
+        if key in keycode.KEY_RIGHT or key in keycode.KEY_SPACE:
+            i += 1
+        elif key in keycode.KEY_LEFT:
+            i += -1
+        elif key in keycode.KEY_DOWN:
+            i += 10
+        elif key in keycode.KEY_UP:
+            i += -10
     print("Last image displayed, exiting.")
 
 if __name__ == '__main__':
