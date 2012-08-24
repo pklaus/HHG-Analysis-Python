@@ -77,4 +77,19 @@ On a Mac:
     PYTHONPATH="/usr/local/lib/python2.7/site-packages/":"${PYTHONPATH}"
     export PYTHONPATH
 
+On Ubuntu Linux:
+
+1. Install OpenCV (read this: http://opencv.willowgarage.com/wiki/InstallGuide)::
+
+    sudo apt-get install cmake libgtk2.0-dev
+    cd ~/Downloads
+    wget http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.0/OpenCV-2.4.0.tar.bz2
+    tar -xf OpenCV-2.4.0.tar.bz2
+    cd OpenCV-2.4.0
+    cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D BUILD_PYTHON_SUPPORT=ON .
+    make
+    sudo make install
+
+2. Install Numpy using ``sudo apt-get install python-numpy python-scipy``
+
 .. _Homebrew: http://mxcl.github.com/homebrew/

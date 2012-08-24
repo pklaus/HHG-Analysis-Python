@@ -112,6 +112,22 @@ export PYTHONPATH</pre>
 </div>
 </li>
 </ol>
+<p>On Ubuntu Linux:</p>
+<ol class="arabic">
+<li><p class="first">Install OpenCV (read this: <a class="reference external" href="http://opencv.willowgarage.com/wiki/InstallGuide">http://opencv.willowgarage.com/wiki/InstallGuide</a>):</p>
+<div class="highlight-python"><pre>sudo apt-get install cmake libgtk2.0-dev
+cd ~/Downloads
+wget http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.0/OpenCV-2.4.0.tar.bz2
+tar -xf OpenCV-2.4.0.tar.bz2
+cd OpenCV-2.4.0
+cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D BUILD_PYTHON_SUPPORT=ON .
+make
+sudo make install</pre>
+</div>
+</li>
+<li><p class="first">Install Numpy using <tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">python-numpy</span> <span class="pre">python-scipy</span></tt></p>
+</li>
+</ol>
 </div>
 </div>
 
