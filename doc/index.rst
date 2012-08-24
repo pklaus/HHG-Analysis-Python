@@ -9,7 +9,7 @@ This toolkit was made to read, analyse and calibrate measurements taken with
 the XUV spectrometer to analyse higher harmonics.
 It is written in Python by Philipp Klaus.
 
-The source code can be found on https://github.com/pklaus/HHG-Analysis-Python .
+The source code can be found on https://github.com/pklaus/HHG-Analysis-Python.
 
 ⓒ 2012 by Philipp Klaus ( pklaus → AT → phys.ksu.edu )
 
